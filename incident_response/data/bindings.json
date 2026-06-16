@@ -1,0 +1,26 @@
+[
+  {
+    "id": "442e7807",
+    "api_pattern": "/api/download/*",
+    "person_id": "ac5b9af2",
+    "priority": 10,
+    "description": "",
+    "created_at": "2026-05-27T06:42:30.914058"
+  },
+  {
+    "id": "7ddc0896",
+    "api_pattern": "/api/login",
+    "person_id": "ac5b9af2",
+    "priority": 5,
+    "description": "",
+    "created_at": "2026-05-27T06:42:30.914131"
+  },
+  {
+    "id": "1eb22aac",
+    "api_pattern": "/api/*",
+    "person_id": "ac5b9af2",
+    "priority": 1,
+    "description": "",
+    "created_at": "2026-05-27T06:42:30.914261"
+  }
+]

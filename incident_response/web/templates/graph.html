@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}知识图谱 — 安全事件响应系统{% endblock %}
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.4/dist/cytoscape.min.js"></script>
+<style>
+#cy { width:100%; height:580px; background:var(--bg-card); border-radius:6px; }
+.cytoscape-container { position:relative; }
+.legend { display:flex; gap:16px; flex-wrap:wrap; padding:12px 0; font-size:12px; }
+.legend-item { display:flex; align-items:center; gap:4px; }
+.legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>知识图谱</h1>
+  <div class="filter-bar">
+    <input class="form-input" id="search-entity" placeholder="搜索实体 (例如: /orders)..." style="width:300px;">
+    <button class="btn" onclick="searchEntity()">搜索</button>
+    <span id="graph-stats" class="text-muted" style="font-size:13px;margin-left:12px;"></span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="cytoscape-container">
+    <div id="cy"></div>
+  </div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#ef5350;"></span> 安全事件</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#42a5f5;"></span> API端点</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#66bb6a;"></span> 人员</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ffa726;"></span> 知识</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ab47bc;"></span> 健康记录</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#26c6da;"></span> 健康变化</span>
+  </div>
+</div>
+
+<div class="card-grid card-grid-2">
+  <div class="card">
+    <h3>影响分析</h3>
+    <div id="impact-container">
+      <p class="text-muted">在上方搜索实体并点击节点以查看影响分析。</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3>关联实体</h3>
+    <div id="related-container">
+      <p class="text-muted">在上方搜索实体以查看关联节点。</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let cy = null;
+
+async function loadGraph() {
+  try {
+    const data = await API.get('/api/graph/export');
+    const stats = await API.get('/api/graph/stats');
+    document.getElementById('graph-stats').textContent =
+      `${stats.total_nodes} 个节点, ${stats.total_edges} 条边`;
+
+    cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements: data.elements,
+      style: [
+        { selector: 'node', style: {
+            'background-color': 'data(color)',
+            'label': 'data(label)',
+            'color': '#e0e0e0',
+            'font-size': '10px',
+            'text-valign': 'bottom',
+            'text-margin-y': '2px',
+            'width': 30, 'height': 30,
+        }},
+        { selector: 'node[type="api_endpoint"]', style: { 'width': 36, 'height': 36 }},
+        { selector: 'node[type="incident"]', style: { 'width': 26, 'height': 26, 'background-color': '#ef5350' }},
+        { selector: 'edge', style: {
+            'width': 1,
+            'line-color': '#555',
+            'target-arrow-color': '#555',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier',
+            'arrow-scale': 0.6,
+        }},
+        { selector: 'edge[type="affects"]', style: { 'line-color': '#ef5350', 'width': 2 }},
+        { selector: 'edge[type="responsible_for"]', style: { 'line-color': '#66bb6a', 'width': 2 }},
+        { selector: 'edge[type="related_to"]', style: { 'line-color': '#ffa726', 'width': 1.5 }},
+      ],
+      layout: { name: 'cose', padding: 20, nodeRepulsion: 4000, idealEdgeLength: 80 },
+      wheelSensitivity: 0.3,
+    });
+
+    // 点击事件处理
+    cy.on('tap', 'node', function(evt) {
+      const node = evt.target;
+      const id = node.id();
+      const type = node.data('type');
+      document.getElementById('search-entity').value = id;
+      loadRelated(id);
+      if (type === 'api_endpoint') loadImpact(id);
+    });
+
+  } catch(err) {
+    document.getElementById('cy').innerHTML =
+      `<div style="text-align:center;padding:80px;color:var(--critical);">加载图谱失败: ${err.message}</div>`;
+  }
+}
+
+async function searchEntity() {
+  const query = document.getElementById('search-entity').value.trim();
+  if (!query) return;
+
+  // 尝试通过遍历节点进行模糊匹配
+  if (cy) {
+    const matching = cy.nodes().filter(n => n.id().includes(query) || n.data('label').includes(query));
+    if (matching.length > 0) {
+      cy.fit(matching, 50);
+      matching.first().trigger('tap');
+      return;
+    }
+  }
+  loadRelated(query);
+}
+
+async function loadImpact(entityId) {
+  const api = entityId.replace('api:', '');
+  try {
+    const data = await API.get('/api/graph/impact?api=' + encodeURIComponent(api));
+    const container = document.getElementById('impact-container');
+    container.innerHTML = `
+      <div class="stat-row">
+        <span class="stat-key">API端点</span>
+        <span class="stat-val">${data.api_endpoint}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">安全事件</span>
+        <span class="stat-val">${data.total_incidents}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">知识条目</span>
+        <span class="stat-val">${data.total_knowledge}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">健康记录</span>
+        <span class="stat-val">${data.health_records_count}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">责任人</span>
+        <span class="stat-val">${data.responsible_persons.length ? data.responsible_persons.join(', ') : '无'}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">严重程度</span>
+        <span class="stat-val">${data.severities.join(', ') || '无'}</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-key">平均有效性</span>
+        <span class="stat-val">${data.avg_effectiveness}</span>
+      </div>
+    `;
+  } catch(err) {
+    document.getElementById('impact-container').innerHTML = `<p class="text-muted">错误: ${err.message}</p>`;
+  }
+}
+
+async function loadRelated(entityId) {
+  try {
+    const data = await API.get('/api/graph/related?entity=' + encodeURIComponent(entityId) + '&hops=2');
+    if (data.error) {
+      document.getElementById('related-container').innerHTML = `<p class="text-muted">${data.error}</p>`;
+      return;
+    }
+    const container = document.getElementById('related-container');
+    let html = `<p style="margin-bottom:8px;">${data.nodes.length} 个节点, ${data.edges.length} 条边</p><table class="table"><thead><tr><th>类型</th><th>标签</th></tr></thead><tbody>`;
+    data.nodes.forEach(n => {
+      html += `<tr><td>${n.type || '-'}</td><td>${n.label}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  } catch(err) {
+    document.getElementById('related-container').innerHTML = `<p class="text-muted">错误: ${err.message}</p>`;
+  }
+}
+
+// 同时支持在搜索框按回车键
+document.addEventListener('DOMContentLoaded', () => {
+  loadGraph();
+  document.getElementById('search-entity').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') searchEntity();
+  });
+});
+</script>
+{% endblock %}

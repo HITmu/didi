@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}仪表盘 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>仪表盘</h1></div>
+<div id="stats-container"><div class="loading"></div></div>
+<div class="card-grid card-grid-2" id="chart-grid" style="display:none;">
+  <div class="card"><h3>严重程度分布</h3><canvas id="severity-chart" height="200"></canvas></div>
+  <div class="card"><h3>处置方式分布</h3><canvas id="disposition-chart" height="200"></canvas></div>
+</div>
+<div class="card" id="recent-card" style="display:none;">
+  <h3>最近安全事件</h3>
+  <div class="table-wrap"><table class="table" id="recent-table"><thead><tr>
+    <th>ID</th><th>API</th><th>严重程度</th><th>置信度</th><th>类型</th><th>处置方式</th><th>状态</th><th>时间</th>
+  </tr></thead><tbody id="recent-body"></tbody></table></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadStats() {
+  const container = document.getElementById('stats-container');
+  try {
+    const stats = await API.get('/api/stats');
+    if (stats.total === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>暂无已处理的安全事件。<br><span style="font-size:12px;">请使用处置引擎处理安全事件以查看仪表盘数据。</span></div>';
+      document.getElementById('chart-grid').style.display = 'none';
+      document.getElementById('recent-card').style.display = 'none';
+      return;
+    }
+    const apis = stats.top_apis ? stats.top_apis.length : (Object.keys(stats.by_api || {}).length);
+    container.innerHTML = `
+      <div class="card stat-card"><div class="stat-value text-accent">${stats.total}</div><div class="stat-label">安全事件总数</div></div>
+      <div class="card stat-card"><div class="stat-value text-critical">${stats.critical_count || 0}</div><div class="stat-label">严重事件</div></div>
+      <div class="card stat-card"><div class="stat-value">${stats.total_knowledge || 0}</div><div class="stat-label">知识条目</div><div class="stat-sub">平均有效性: ${((stats.avg_effectiveness||0)*100).toFixed(0)}%</div></div>
+      <div class="card stat-card"><div class="stat-value">${apis}</div><div class="stat-label">API端点</div></div>
+    `;
+    document.getElementById('chart-grid').style.display = 'grid';
+    document.getElementById('recent-card').style.display = 'block';
+    renderSeverityChart(stats.by_severity || {});
+    renderDispositionChart(stats.by_disposition || {});
+    renderRecentIncidents(stats);
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state" style="color:var(--critical);">加载失败: ${err.message}</div>`;
+  }
+}
+
+function renderSeverityChart(bySev) {
+  const order = ['CRITICAL','HIGH','MEDIUM','LOW','INFO'];
+  const colors = ['#ef5350','#ff9800','#ffc107','#4caf50','#90a4ae'];
+  const labels = [], data = [], bg = [];
+  for (const s of order) {
+    if ((bySev[s]||0) > 0) { labels.push(s); data.push(bySev[s]); bg.push(colors[order.indexOf(s)]); }
+  }
+  new Chart(document.getElementById('severity-chart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: bg, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#9e9e9e', padding: 12 } } } }
+  });
+}
+
+function renderDispositionChart(byDisp) {
+  const labels = Object.keys(byDisp);
+  const data = Object.values(byDisp);
+  const colors = labels.map(l =>
+    l === 'auto_block' ? '#ef5350' : l === 'escalate' ? '#ff9800' :
+    l === 'notify_email' ? '#ffc107' : l === 'auto_log' ? '#4caf50' : '#90a4ae'
+  );
+  new Chart(document.getElementById('disposition-chart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#9e9e9e', padding: 12 } } } }
+  });
+}
+
+function renderRecentIncidents(stats) {
+  // 统计端点不返回事件列表，需要单独获取
+  API.get('/api/incidents?limit=5').then(incidents => {
+    const tbody = document.getElementById('recent-body');
+    if (!incidents.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">暂无安全事件</td></tr>'; return; }
+    tbody.innerHTML = incidents.map(i => `<tr>
+      <td title="${i.id}">${truncate(i.id, 8)}</td>
+      <td class="ellipsis" title="${i.api_endpoint}">${i.api_endpoint}</td>
+      <td>${severityBadge(i.severity)}</td>
+      <td>${formatPct(i.confidence)}</td>
+      <td>${i.anomaly_type || '-'}</td>
+      <td>${dispositionBadge(i.disposition)}</td>
+      <td>${statusBadge(i.disposition_status)}</td>
+      <td>${formatDate(i.detected_at)}</td>
+    </tr>`).join('');
+  }).catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', loadStats);
+</script>
+{% endblock %}

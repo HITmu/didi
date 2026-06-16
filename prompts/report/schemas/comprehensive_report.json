@@ -1,0 +1,45 @@
+### 输出 JSON Schema（所有字段必须中文）
+{
+  "executive_summary": {
+    "status": "active|stable|critical",
+    "overall_risk_level": "高|中|低",
+    "key_findings": ["具体发现1（引用攻击样本）", "具体发现2", "具体发现3"]
+  },
+  "attack_analysis": {
+    "api_attacks": {
+      "detected_types": ["检测到的攻击类型列表"],
+      "total_confirmed": "确认总数",
+      "primary_threat": "最主要的威胁类型及原因分析",
+      "per_type_analysis": "逐类型分析：引用具体攻击样本URL，说明每种攻击的手法和潜在危害",
+      "recall_gap_analysis": "分析低召回率类型的原因和改进方向"
+    },
+    "crawler_analysis": {
+      "distributed_crawlers": [{
+        "scale": "规模描述",
+        "detection_evidence": "检出依据",
+        "behavior_pattern": "行为模式分析",
+        "impact": "影响评估",
+        "remediation": "防御建议（中文）"
+      }],
+      "crowdsourced_crawlers": {
+        "detected": true,
+        "session_count": "会话数",
+        "analysis": "众包爬虫分析（中文）"
+      }
+    },
+    "patterns_summary": "整体攻击模式总结（中文）"
+  },
+  "defense_recommendations": [
+    {
+      "priority": "高|中|低",
+      "title": "具体建议标题（中文）",
+      "target": "针对的接口或攻击类型",
+      "description": "详细技术方案（中文，包含具体配置示例或代码片段）"
+    }
+  ],
+  "conclusion": {
+    "overall_assessment": "基于检测数据的总体安全态势评估（中文）",
+    "immediate_actions": ["需立即执行的行动（中文）"],
+    "long_term_improvements": ["长期改进建议（中文）"]
+  }
+}

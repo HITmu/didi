@@ -1,0 +1,8 @@
+# 处置动作 → 解释文本模板
+# 格式：disposition_key: 模板（{变量} 占位符）
+
+notify_email: The '{anomaly_type}' attack on {api_endpoint} has been escalated to {responsible_person} (severity: {severity}, confidence: {confidence:.0%}). Notification email with evidence details and {remediation_guide} has been sent.
+auto_block: CRITICAL '{anomaly_type}' attack on {api_endpoint} (severity: {severity}, confidence: {confidence:.0%}). Source IP has been automatically blocked. The block will persist for 24 hours. {remediation_guide}
+auto_log: Low-severity '{anomaly_type}' pattern on {api_endpoint} (severity: {severity}, confidence: {confidence:.0%}). Event logged for monitoring and trend analysis. No immediate action required.
+escalate: The '{anomaly_type}' incident on {api_endpoint} has been escalated to the security team (severity: {severity}). Manual review required within 4 hours.
+none: '{anomaly_type}' event on {api_endpoint} was evaluated but determined to be below the action threshold (confidence: {confidence:.0%}). No disposition action taken.

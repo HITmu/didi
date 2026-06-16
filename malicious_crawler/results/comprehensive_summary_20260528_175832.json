@@ -1,0 +1,532 @@
+{
+  "total_sessions": 3072,
+  "total_records": 7030,
+  "true_distribution": {
+    "malicious_crawler": 2497,
+    "distributed_crawler": 834,
+    "directory_traversal": 290,
+    "legit_crawler": 324,
+    "ssrf": 290,
+    "csrf": 290,
+    "invalid_item_value": 290,
+    "normal": 444,
+    "command_injection": 290,
+    "sql_injection": 290,
+    "unauthorized_access": 290,
+    "sensitive_data_leakage": 290,
+    "performance_issue": 290,
+    "crowdsourced_crawler": 31,
+    "xss": 290
+  },
+  "detection_distribution": {
+    "normal": 3011,
+    "distributed_crawler": 31,
+    "crowdsourced_crawler": 16,
+    "suspicious": 14
+  },
+  "stage2_attack_types": {
+    "directory traversal attack": 408,
+    "invalid item value": 181,
+    "injection attack": 461,
+    "unauthorized access attack": 158,
+    "cross-site scripting attack": 290,
+    "performance issue": 104,
+    "sensitive data leakage": 290
+  },
+  "stage1_filter_rate": 0.1092,
+  "global_assessment": {
+    "has_distributed_crawler": true,
+    "has_crowdsourced_crawler": true,
+    "distributed_session_count": 31,
+    "crowdsourced_session_count": 16,
+    "suspicious_session_count": 14
+  },
+  "clusters": [
+    {
+      "size": 101,
+      "avg_fusion": 0.2037,
+      "determination": "normal"
+    },
+    {
+      "size": 101,
+      "avg_fusion": 0.2067,
+      "determination": "normal"
+    },
+    {
+      "size": 300,
+      "avg_fusion": 0.0765,
+      "determination": "normal"
+    },
+    {
+      "size": 508,
+      "avg_fusion": 0.0471,
+      "determination": "normal"
+    },
+    {
+      "size": 101,
+      "avg_fusion": 0.1868,
+      "determination": "normal"
+    },
+    {
+      "size": 101,
+      "avg_fusion": 0.1861,
+      "determination": "normal"
+    },
+    {
+      "size": 100,
+      "avg_fusion": 0.1844,
+      "determination": "normal"
+    },
+    {
+      "size": 101,
+      "avg_fusion": 0.1828,
+      "determination": "normal"
+    },
+    {
+      "size": 100,
+      "avg_fusion": 0.1944,
+      "determination": "normal"
+    },
+    {
+      "size": 103,
+      "avg_fusion": 0.19,
+      "determination": "normal"
+    },
+    {
+      "size": 99,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 102,
+      "avg_fusion": 0.1868,
+      "determination": "normal"
+    },
+    {
+      "size": 104,
+      "avg_fusion": 0.1853,
+      "determination": "normal"
+    },
+    {
+      "size": 97,
+      "avg_fusion": 0.1831,
+      "determination": "normal"
+    },
+    {
+      "size": 82,
+      "avg_fusion": 0.186,
+      "determination": "normal"
+    },
+    {
+      "size": 81,
+      "avg_fusion": 0.1915,
+      "determination": "normal"
+    },
+    {
+      "size": 81,
+      "avg_fusion": 0.1956,
+      "determination": "normal"
+    },
+    {
+      "size": 159,
+      "avg_fusion": 0.1005,
+      "determination": "normal"
+    },
+    {
+      "size": 59,
+      "avg_fusion": 0.2078,
+      "determination": "normal"
+    },
+    {
+      "size": 63,
+      "avg_fusion": 0.2069,
+      "determination": "normal"
+    },
+    {
+      "size": 60,
+      "avg_fusion": 0.1918,
+      "determination": "normal"
+    },
+    {
+      "size": 62,
+      "avg_fusion": 0.1953,
+      "determination": "normal"
+    },
+    {
+      "size": 53,
+      "avg_fusion": 0.1989,
+      "determination": "normal"
+    },
+    {
+      "size": 192,
+      "avg_fusion": 0.0654,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.3723,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.329,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.5472,
+      "determination": "suspicious"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.4191,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.3297,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.5079,
+      "determination": "suspicious"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.5388,
+      "determination": "suspicious"
+    },
+    {
+      "size": 12,
+      "avg_fusion": 0.6016,
+      "determination": "distributed_crawler"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.4598,
+      "determination": "suspicious"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3326,
+      "determination": "normal"
+    },
+    {
+      "size": 15,
+      "avg_fusion": 0.4756,
+      "determination": "suspicious"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3458,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.4075,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3825,
+      "determination": "normal"
+    }
+  ],
+  "coverage_global": {
+    "entropy": 0.9225,
+    "completeness": 0.0001,
+    "sequential_score": 1.0,
+    "idle_ratio": 0.9473,
+    "suspicious": false
+  },
+  "coverage_per_pattern": {
+    "scraper": {
+      "entropy": 0.9671,
+      "completeness": 0.64,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "credential_stuffer": {
+      "entropy": 1.0,
+      "completeness": 1.0,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "unknown": {
+      "entropy": 0.9925,
+      "completeness": 0.0001,
+      "idle_ratio": 1.0,
+      "suspicious": false
+    },
+    "legit": {
+      "entropy": 0.9988,
+      "completeness": 0.6429,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "ddos_tool": {
+      "entropy": 1.0,
+      "completeness": 1.0,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "normal": {
+      "entropy": 0.9966,
+      "completeness": 0.6429,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "crowdsourced": {
+      "entropy": 1.0,
+      "completeness": 0.9394,
+      "idle_ratio": 0.625,
+      "suspicious": true
+    }
+  },
+  "network": {
+    "crowdsourced_ratio": 0.1031,
+    "crowdsourced_flag": false
+  },
+  "malicious_details": [
+    {
+      "session_id": "malicious_ddos_tool_e30d42",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6419
+    },
+    {
+      "session_id": "malicious_ddos_tool_8e64e9",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6419
+    },
+    {
+      "session_id": "malicious_distributed_scraper_5050f4",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6108
+    },
+    {
+      "session_id": "malicious_distributed_scraper_014088",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_4aa454",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_261443",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_c6258e",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_a8dd43",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_5e459d",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_0547f7",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_distributed_scraper_79df12",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6079
+    },
+    {
+      "session_id": "malicious_credential_stuffer_40b77a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.59
+    },
+    {
+      "session_id": "malicious_credential_stuffer_07dd05",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.59
+    },
+    {
+      "session_id": "malicious_distributed_scraper_219983",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_182868",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_a7981f",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_4c0ac5",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_19d6ed",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_b3391a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_5bb890",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_af5d5b",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_b76132",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_5d448c",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_e7eae0",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5875
+    },
+    {
+      "session_id": "malicious_distributed_scraper_99072b",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5817
+    },
+    {
+      "session_id": "malicious_distributed_scraper_756d0a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5817
+    },
+    {
+      "session_id": "malicious_distributed_scraper_8fa606",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5817
+    },
+    {
+      "session_id": "malicious_ddos_tool_d2d3f9",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5763
+    },
+    {
+      "session_id": "malicious_distributed_scraper_40c2d3",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5562
+    },
+    {
+      "session_id": "malicious_distributed_scraper_14e8d7",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5517
+    }
+  ],
+  "stage1_metrics": {
+    "train_samples": 4921,
+    "train_attacks": 4383,
+    "train_normal": 538,
+    "test_samples": 2109,
+    "test_attacks": 1879,
+    "test_normal": 230,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 1879,
+    "fp": 0,
+    "tn": 230,
+    "fn": 0
+  },
+  "stage2_metrics": {
+    "per_type_recall": {
+      "directory traversal attack": 1.0,
+      "injection attack": 0.5298850574712644,
+      "unauthorized access attack": 0.27241379310344827,
+      "invalid item value": 0.6241379310344828,
+      "sensitive data leakage": 0.8413793103448276,
+      "performance issue": 0.3586206896551724,
+      "cross-site scripting attack": 1.0
+    },
+    "total_detected": 1892,
+    "tp_by_type": {
+      "directory traversal attack": 290,
+      "invalid item value": 181,
+      "injection attack": 461,
+      "unauthorized access attack": 158,
+      "cross-site scripting attack": 290,
+      "performance issue": 104,
+      "sensitive data leakage": 244
+    },
+    "fn_by_type": {
+      "directory traversal attack": 290,
+      "injection attack": 870,
+      "unauthorized access attack": 580,
+      "invalid item value": 290,
+      "sensitive data leakage": 290,
+      "performance issue": 290,
+      "cross-site scripting attack": 290
+    }
+  },
+  "stage4_metrics": {
+    "test_sessions": 50,
+    "test_mal": 27,
+    "test_normal": 23,
+    "precision": 0.9230769230769231,
+    "recall": 0.8888888888888888,
+    "f1": 0.9056603773584906,
+    "tp": 24,
+    "fp": 2,
+    "tn": 21,
+    "fn": 3
+  },
+  "_prompt_vars": {
+    "train_samples": 4921,
+    "train_attacks": 4383,
+    "train_normal": 538,
+    "test_samples": 2109,
+    "test_attacks": 1879,
+    "test_normal": 230,
+    "stage1_precision": "1.0000",
+    "stage1_recall": "1.0000",
+    "stage1_f1": "1.0000",
+    "stage1_filter_rate": "10.9%",
+    "stage2_attack_types": "{\"directory traversal attack\": 408, \"invalid item value\": 181, \"injection attack\": 461, \"unauthorized access attack\": 158, \"cross-site scripting attack\": 290, \"performance issue\": 104, \"sensitive data leakage\": 290}",
+    "stage2_details": "- injection attack: 461 条确认（regex召回率 53.0%)\n- directory traversal attack: 408 条确认（regex召回率 100.0%)\n- cross-site scripting attack: 290 条确认（regex召回率 100.0%)\n- sensitive data leakage: 290 条确认（regex召回率 84.1%)\n- invalid item value: 181 条确认（regex召回率 62.4%)\n- unauthorized access attack: 158 条确认（regex召回率 27.2%)\n- performance issue: 104 条确认（regex召回率 35.9%)",
+    "stage2_recall_table": "  directory traversal attack       100.0%\n  cross-site scripting attack      100.0%\n  unauthorized access attack        27.2%\n  injection attack                  53.0%\n  performance issue                 35.9%\n  sensitive data leakage            84.1%\n  invalid item value                62.4%",
+    "has_distributed_crawler": true,
+    "has_crowdsourced_crawler": true,
+    "distributed_session_count": 31,
+    "crowdsourced_session_count": 16,
+    "ens_test_sessions": 50,
+    "ens_test_mal": 27,
+    "ens_test_normal": 23,
+    "ens_precision": "0.9231",
+    "ens_recall": "0.8889",
+    "ens_f1": "0.9057",
+    "coverage_entropy": 0.9225,
+    "coverage_completeness": 0.0001,
+    "idle_ratio": 0.9473,
+    "coverage_per_pattern": "- credential_stuffer: entropy=1.0, completeness=1.0, idle_ratio=0.0\n- crowdsourced: entropy=1.0, completeness=0.9394, idle_ratio=0.625\n- ddos_tool: entropy=1.0, completeness=1.0, idle_ratio=0.0\n- legit: entropy=0.9988, completeness=0.6429, idle_ratio=0.0\n- normal: entropy=0.9966, completeness=0.6429, idle_ratio=0.0\n- scraper: entropy=0.9671, completeness=0.64, idle_ratio=0.0\n- unknown: entropy=0.9925, completeness=0.0001, idle_ratio=1.0",
+    "cluster_count": 38,
+    "cluster_details": "- 簇 #0: size=101, avg_fusion=0.2037, 判定=normal\n- 簇 #1: size=101, avg_fusion=0.2067, 判定=normal\n- 簇 #2: size=300, avg_fusion=0.0765, 判定=normal\n- 簇 #3: size=508, avg_fusion=0.0471, 判定=normal\n- 簇 #4: size=101, avg_fusion=0.1868, 判定=normal\n- 簇 #5: size=101, avg_fusion=0.1861, 判定=normal\n- 簇 #6: size=100, avg_fusion=0.1844, 判定=normal\n- 簇 #7: size=101, avg_fusion=0.1828, 判定=normal\n- 簇 #8: size=100, avg_fusion=0.1944, 判定=normal\n- 簇 #9: size=103, avg_fusion=0.19, 判定=normal\n- 簇 #10: size=99, avg_fusion=0.1842, 判定=normal\n- 簇 #11: size=102, avg_fusion=0.1868, 判定=normal\n- 簇 #12: size=104, avg_fusion=0.1853, 判定=normal\n- 簇 #13: size=97, avg_fusion=0.1831, 判定=normal\n- 簇 #14: size=82, avg_fusion=0.186, 判定=normal",
+    "malicious_details": "- malicious_ddos_tool_e30d42: distributed_crawler (fusion=0.642)\n- malicious_ddos_tool_8e64e9: distributed_crawler (fusion=0.642)\n- malicious_distributed_scraper_5050f4: distributed_crawler (fusion=0.611)\n- malicious_distributed_scraper_014088: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_4aa454: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_261443: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_c6258e: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_a8dd43: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_5e459d: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_0547f7: distributed_crawler (fusion=0.608)\n- malicious_distributed_scraper_79df12: distributed_crawler (fusion=0.608)\n- malicious_credential_stuffer_40b77a: distributed_crawler (fusion=0.590)\n- malicious_credential_stuffer_07dd05: distributed_crawler (fusion=0.590)\n- malicious_distributed_scraper_219983: distributed_crawler (fusion=0.588)\n- malicious_distributed_scraper_182868: distributed_crawler (fusion=0.588)"
+  }
+}

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}安全报告 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>安全报告</h1></div>
+<div id="report-container"><div class="loading"></div></div>
+
+<!-- 摘要卡片 -->
+<div class="card-grid card-grid-4" id="summary-cards" style="display:none;"></div>
+
+<!-- 严重程度图表 + 表格 -->
+<div class="card-grid card-grid-2" id="report-charts" style="display:none;">
+  <div class="card"><h3>严重程度分布</h3><canvas id="severity-chart" height="200"></canvas></div>
+  <div class="card"><h3>健康影响</h3><canvas id="health-chart" height="200"></canvas></div>
+</div>
+
+<!-- 事件表格 -->
+<div class="card" id="incidents-card" style="display:none;">
+  <h3>安全事件详情</h3>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>API端点</th><th>数量</th><th>严重程度</th><th>处置方式</th>
+  </tr></thead><tbody id="incidents-breakdown-body"></tbody></table></div>
+</div>
+
+<!-- 健康影响表格 -->
+<div class="card" id="health-card" style="display:none;">
+  <h3>端点健康影响</h3>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>API端点</th><th>变化次数</th><th>变化总量</th>
+  </tr></thead><tbody id="health-breakdown-body"></tbody></table></div>
+</div>
+
+<!-- 有效性表格 -->
+<div class="card" id="effectiveness-card" style="display:none;">
+  <h3>处置有效性</h3>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>类型</th><th>出现次数</th><th>平均有效性</th><th>示例模式</th>
+  </tr></thead><tbody id="effectiveness-body"></tbody></table></div>
+</div>
+
+<!-- 建议 -->
+<div class="card" id="recommendations-card" style="display:none;">
+  <h3>改进建议</h3>
+  <ul id="recommendations-list" style="list-style:disc;padding-left:20px;"></ul>
+</div>
+
+<!-- 责任人 -->
+<div class="card" id="persons-card" style="display:none;">
+  <h3>责任人</h3>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>姓名</th><th>角色</th><th>邮箱</th><th>电话</th>
+  </tr></thead><tbody id="persons-body"></tbody></table></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadReport() {
+  const container = document.getElementById('report-container');
+  try {
+    const report = await API.get('/api/report');
+    const es = report.executive_summary || {};
+    if (es.status === 'no incidents' || es.total_incidents === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>暂无已处理的安全事件。<br><span style="font-size:12px;">请使用处置引擎处理安全事件以生成安全报告。</span></div>';
+      document.querySelectorAll('[id$="-cards"], [id$="-card"], #report-charts').forEach(el => el.style.display = 'none');
+      return;
+    }
+    container.innerHTML = '<div class="empty-state" style="display:none;"></div>';
+    document.querySelectorAll('#summary-cards, #report-charts, #incidents-card, #health-card, #effectiveness-card, #recommendations-card, #persons-card').forEach(el => el.style.display = '');
+
+    renderSummaryCards(es);
+    renderSeverityChart(es);
+    renderHealthChart(report.health_assessment);
+    renderIncidentsBreakdown(report.incident_breakdown);
+    renderHealthBreakdown(report.health_assessment);
+    renderEffectiveness(report.insights);
+    renderRecommendations(report.insights);
+    renderPersons(report.responsible_persons);
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state" style="color:var(--critical);">加载报告失败: ${err.message}</div>`;
+  }
+}
+
+function renderSummaryCards(es) {
+  const cards = document.getElementById('summary-cards');
+  cards.innerHTML = `
+    <div class="card stat-card"><div class="stat-value text-accent">${es.total_incidents}</div><div class="stat-label">安全事件总数</div></div>
+    <div class="card stat-card"><div class="stat-value text-critical">${es.critical_count || 0}</div><div class="stat-label">严重事件</div></div>
+    <div class="card stat-card"><div class="stat-value">${es.unique_apis_affected || 0}</div><div class="stat-label">受影响API</div></div>
+    <div class="card stat-card"><div class="stat-value">${es.high_count || 0}</div><div class="stat-label">高严重度</div></div>
+  `;
+}
+
+function renderSeverityChart(es) {
+  const labels = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+  const data = [es.critical_count || 0, es.high_count || 0, es.medium_count || 0, es.low_count || 0];
+  const colors = ['#ef5350', '#ff9800', '#ffc107', '#4caf50'];
+  new Chart(document.getElementById('severity-chart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#9e9e9e', padding: 12 } } } }
+  });
+}
+
+function renderHealthChart(ha) {
+  if (!ha || ha.status === 'no data') {
+    document.getElementById('health-chart').parentElement.innerHTML = '<h3>健康影响</h3><p style="color:var(--text-muted);padding:16px;">暂无健康数据。</p>';
+    return;
+  }
+  const labels = ['改善', '恶化', '不变'];
+  const data = [ha.improved_count || 0, ha.degraded_count || 0, ha.unchanged_count || 0];
+  const colors = ['#4caf50', '#ef5350', '#9e9e9e'];
+  new Chart(document.getElementById('health-chart'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#9e9e9e', padding: 12 } } } }
+  });
+}
+
+function renderIncidentsBreakdown(ib) {
+  if (!ib || !ib.by_endpoint) return;
+  const tbody = document.getElementById('incidents-breakdown-body');
+  tbody.innerHTML = Object.entries(ib.by_endpoint).map(([api, info]) =>
+    `<tr><td class="ellipsis" title="${api}">${api}</td>
+     <td>${info.count}</td>
+     <td>${Object.entries(info.severities || {}).map(([k,v]) => `${k}=${v}`).join(', ')}</td>
+     <td>${Object.entries(info.dispositions || {}).map(([k,v]) => `${k}=${v}`).join(', ')}</td></tr>`
+  ).join('');
+}
+
+function renderHealthBreakdown(ha) {
+  if (!ha || ha.status === 'no data' || !ha.by_api) return;
+  const tbody = document.getElementById('health-breakdown-body');
+  tbody.innerHTML = Object.entries(ha.by_api).map(([api, info]) =>
+    `<tr><td class="ellipsis" title="${api}">${api}</td>
+     <td>${info.changes}</td>
+     <td style="color:${info.total_delta >= 0 ? 'var(--low)' : 'var(--critical)'};">${info.total_delta >= 0 ? '+' : ''}${info.total_delta.toFixed(4)}</td></tr>`
+  ).join('');
+}
+
+function renderEffectiveness(insights) {
+  if (!insights || !insights.patterns || !insights.patterns.length) return;
+  const tbody = document.getElementById('effectiveness-body');
+  tbody.innerHTML = insights.patterns.map(p =>
+    `<tr><td>${p.type}</td><td>${p.count}</td><td>${p.avg_effectiveness.toFixed(4)}</td><td class="ellipsis" title="${p.example_pattern}">${p.example_pattern}</td></tr>`
+  ).join('');
+}
+
+function renderRecommendations(insights) {
+  if (!insights || !insights.recommendations || !insights.recommendations.length) return;
+  const list = document.getElementById('recommendations-list');
+  list.innerHTML = insights.recommendations.map(r =>
+    `<li><strong>${r.type}:</strong> ${r.recommendation}</li>`
+  ).join('');
+}
+
+function renderPersons(persons) {
+  if (!persons || !persons.length) return;
+  const tbody = document.getElementById('persons-body');
+  tbody.innerHTML = persons.map(p =>
+    `<tr><td>${p.name}</td><td>${p.role}</td><td>${p.email}</td><td>${p.phone || ''}</td></tr>`
+  ).join('');
+}
+
+document.addEventListener('DOMContentLoaded', loadReport);
+</script>
+{% endblock %}

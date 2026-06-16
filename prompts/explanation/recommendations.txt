@@ -1,0 +1,81 @@
+# NLG 解释模板：攻击类型 → payload变体 → 建议文本
+# 格式：每行一个模板，使用 {变量} 占位符
+
+[directory_traversal:etc_passwd]
+在 {api_endpoint} 端点检测到针对 /etc/passwd 的目录遍历攻击（payload: {payload}）。
+建议措施：1) 全面审查该 API 的路径解析逻辑，禁止路径参数中包含 ".." "/" "%2f" 等特殊字符；
+2) 使用白名单方式限制可访问的文件路径，拒绝所有包含操作系统敏感路径的请求；
+3) 在部署环境实施 chroot 或容器化隔离，即使路径过滤失败也无法读取系统文件。
+
+[directory_traversal:etc_hosts]
+在 {api_endpoint} 端点检测到尝试读取 /etc/hosts 的目录遍历攻击（payload: {payload}）。
+建议措施：1) 实施路径标准化（canonicalization）后再进行访问控制判断；
+2) 配置 WAF 规则拦截包含系统文件名的请求（/etc/passwd, /etc/shadow, /etc/hosts 等）；
+3) 审计该 API 的文件读取逻辑，确认是否允许用户输入控制文件路径。
+
+[directory_traversal:encoded]
+在 {api_endpoint} 端点检测到使用 URL 编码绕过过滤的目录遍历攻击（payload: {payload}）。
+建议措施：1) 在路径校验前进行 URL 解码，对解码后的内容重新检查；
+2) 递归解码（最多 5 层）以防止多重编码绕过；
+3) 标准化后再检查，捕获 %2e%2e%2f 等编码变体。
+
+[directory_traversal:backup]
+在 {api_endpoint} 端点检测到尝试读取备份文件的目录遍历攻击（payload: {payload}）。
+攻击者可能尝试获取配置备份或应用源码。建议措施：1) 禁止通过 API 访问任何以 .bak .old .backup .sql .tar .gz 结尾的路径；
+2) 将备份文件存储在 Web 根目录之外的独立存储中；
+3) 确认应用的部署流程不会将敏感备份文件暴露在 API 路径下。
+
+[directory_traversal:default]
+在 {api_endpoint} 端点检测到目录遍历攻击（payload: {payload}）。
+建议措施：1) 确保路径参数经过严格的白名单验证；
+2) 使用文件 ID 映射代替直接的文件路径参数；
+3) 部署 WAF 并启用路径遍历防护规则。
+
+[injection:tautology]
+在 {api_endpoint} 端点检测到 SQL 注入恒真式攻击（payload: {payload}），攻击者使用 OR 1=1 等方式尝试绕过认证或提取全表数据。
+建议措施：1) 全面使用参数化查询（PreparedStatement），禁止拼接用户输入到 SQL 语句；
+2) 检查该 API 的数据访问层，确认所有用户输入都通过占位符传递；
+3) 对输入进行严格类型校验（数字参数拒绝非数字字符）。
+
+[injection:union]
+在 {api_endpoint} 端点检测到 SQL 注入联合查询攻击（payload: {payload}），攻击者尝试通过 UNION SELECT 窃取其他表数据。
+建议措施：1) 立即使用参数化查询替换字符串拼接；
+2) 实施最小权限原则，应用数据库账户只授予必要的表和操作权限；
+3) 部署数据库防火墙或 SQL 注入检测插件。
+
+[injection:blind]
+在 {api_endpoint} 端点检测到盲注式 SQL 注入尝试（payload: {payload}）。
+建议措施：1) 使用参数化查询 / ORM 框架；
+2) 限制数据库错误信息返回，不在 HTTP 响应中暴露 SQL 错误详情；
+3) 配置数据库查询超时，减轻基于时间延迟的盲注攻击。
+
+[injection:default]
+在 {api_endpoint} 端点检测到注入类攻击（payload: {payload}）。
+建议措施：1) 对所有用户输入进行参数化处理；
+2) 实施输入验证和输出编码；
+3) 定期进行渗透测试和代码审查。
+
+[xss:default]
+在 {api_endpoint} 端点检测到跨站脚本攻击（payload: {payload}），攻击者尝试注入恶意脚本代码。
+建议措施：1) 对所有用户输入进行 HTML 实体编码后再输出；
+2) 使用 Content-Security-Policy 头限制脚本执行来源；
+3) 实施输入验证，拒绝包含 HTML 标签和 JS 事件处理器的输入；
+4) 考虑使用 DOMPurify 等服务端 HTML 清洗库。
+
+[unauthorized_access:default]
+在 {api_endpoint} 端点检测到未授权访问尝试。
+建议措施：1) 确认该端点的认证和授权中间件是否正常运作；
+2) 检查访问控制列表（ACL），确保普通用户无法访问管理接口；
+3) 实施 API 级别的权限校验，不仅要检查登录状态，还要验证用户角色。
+
+[sensitive_data_leakage:default]
+在 {api_endpoint} 端点检测到敏感信息泄露风险。
+建议措施：1) 移除所有调试端点和配置输出接口；
+2) 确保错误页面不包含堆栈跟踪、环境变量等敏感信息；
+3) 对返回数据进行最小化处理，只返回前端需要的数据字段。
+
+[default]
+检测到 {anomaly_type} 类安全事件在 {api_endpoint} 端点。
+建议措施：1) 分析该事件的严重程度和影响范围；
+2) 根据事件类型查阅对应的安全策略和修复指南；
+3) 将该事件记录到安全知识库，用于后续检测优化。

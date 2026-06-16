@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% block title %}企业知识库 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>企业知识库</h1></div>
+<div id="ek-summary"><div class="loading"></div></div>
+
+<div class="card mb-16">
+  <h3>搜索与筛选</h3>
+  <div class="filter-bar" style="margin-top:8px;">
+    <input class="form-input" id="search-query" placeholder="搜索文本..." oninput="debounceEkSearch()">
+    <select class="form-select" id="search-category" onchange="searchEk()">
+      <option value="">所有类别</option>
+      <option value="policy">策略</option>
+      <option value="case">案例</option>
+      <option value="pattern">模式</option>
+      <option value="role_insight">角色洞察</option>
+      <option value="best_practice">最佳实践</option>
+    </select>
+    <select class="form-select" id="search-severity" onchange="searchEk()">
+      <option value="">所有严重程度</option>
+      <option value="CRITICAL">严重</option>
+      <option value="HIGH">高</option>
+      <option value="MEDIUM">中</option>
+      <option value="LOW">低</option>
+      <option value="INFO">信息</option>
+    </select>
+    <span id="search-count" class="text-muted" style="font-size:13px;"></span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px;">
+  <div class="card">
+    <h3>知识条目
+      <span style="float:right;display:flex;gap:8px;">
+        <button class="btn btn-sm" onclick="rebuildEk()">重建</button>
+        <button class="btn btn-sm" onclick="seedEk()">初始化策略</button>
+        <button class="btn btn-primary btn-sm" onclick="showModal('ek-add-modal')">+ 添加</button>
+      </span>
+    </h3>
+    <div class="table-wrap"><table class="table"><thead><tr>
+      <th>ID</th><th>类别</th><th>严重程度</th><th>标题</th><th>有效性</th><th>使用次数</th><th>操作</th>
+    </tr></thead><tbody id="ek-body"></tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>类别分布</h3>
+    <div class="chart-container chart-container-sm"><canvas id="ek-category-chart"></canvas></div>
+  </div>
+</div>
+
+<div class="card" id="ek-detail" style="display:none;margin-bottom:16px;">
+  <h3 id="ek-detail-title"></h3>
+  <div id="ek-detail-content" style="line-height:1.7;"></div>
+</div>
+
+<div class="card">
+  <h3>RAG 上下文预览</h3>
+  <div class="filter-bar" style="margin-top:8px;">
+    <input class="form-input" id="rag-type" placeholder="安全事件类型 (例如: sql_injection)..." value="">
+    <input class="form-input" id="rag-endpoint" placeholder="API端点 (例如: /api/login)..." value="">
+    <select class="form-select" id="rag-severity">
+      <option value="">严重程度</option>
+      <option value="CRITICAL">严重</option>
+      <option value="HIGH">高</option>
+      <option value="MEDIUM">中</option>
+    </select>
+    <button class="btn btn-primary" onclick="previewRagContext()">预览</button>
+  </div>
+  <div id="rag-result" style="margin-top:12px;display:none;">
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">条目数: <span id="rag-count">0</span></div>
+    <pre id="rag-context" style="background:var(--bg-primary);padding:16px;border-radius:8px;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;color:var(--text-primary);border:1px solid var(--border);"></pre>
+  </div>
+</div>
+
+<!-- Add Entry Modal -->
+<div class="modal" id="ek-add-modal">
+  <div class="modal-backdrop" onclick="hideModal('ek-add-modal')"></div>
+  <div class="modal-body modal-body-lg">
+    <h3>添加企业知识条目</h3>
+    <div class="form-group">
+      <label>标题</label>
+      <input class="form-input" id="add-title" placeholder="条目标题">
+    </div>
+    <div class="form-group">
+      <label>内容</label>
+      <textarea class="form-input" id="add-content" rows="4" placeholder="知识内容..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>类别</label>
+        <select class="form-select" id="add-category" style="width:100%">
+          <option value="policy">策略</option>
+          <option value="case">案例</option>
+          <option value="pattern">模式</option>
+          <option value="role_insight">角色洞察</option>
+          <option value="best_practice" selected>最佳实践</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>严重程度</label>
+        <select class="form-select" id="add-severity" style="width:100%">
+          <option value="CRITICAL">严重</option>
+          <option value="HIGH">高</option>
+          <option value="MEDIUM" selected>中</option>
+          <option value="LOW">低</option>
+          <option value="INFO">信息</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>标签 (逗号分隔)</label>
+      <input class="form-input" id="add-tags" placeholder="例如: sql_injection, database">
+    </div>
+    <div class="form-group">
+      <label>修复措施</label>
+      <textarea class="form-input" id="add-remediation" rows="2" placeholder="修复步骤..."></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addEkEntry()">保存</button>
+      <button class="btn" onclick="hideModal('ek-add-modal')">取消</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let catChart = null;
+let searchTimer;
+
+function debounceEkSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(searchEk, 300); }
+
+function categoryBadge(cat) {
+  const colors = {
+    policy: {bg:'#1a237e', txt:'#7986cb'},
+    case: {bg:'#1b5e20', txt:'#81c784'},
+    pattern: {bg:'#e65100', txt:'#ffb74d'},
+    role_insight: {bg:'#4a148c', txt:'#ce93d8'},
+    best_practice: {bg:'#01579b', txt:'#4fc3f7'},
+  };
+  const c = colors[cat] || {bg:'#333', txt:'#ccc'};
+  const label = cat.replace(/_/g, ' ');
+  return `<span class="badge" style="background:${c.bg};color:${c.txt};">${label}</span>`;
+}
+
+async function loadEkSummary() {
+  try {
+    const stats = await API.get('/api/enterprise-knowledge/stats');
+    const container = document.getElementById('ek-summary');
+    if (stats.total === 0) {
+      container.innerHTML = '<div class="card stat-card" style="text-align:center;"><div class="empty-icon">📚</div>暂无企业知识条目。请使用"初始化策略"或"重建"来填充数据。</div>';
+      return;
+    }
+    const effPct = ((stats.avg_effectiveness||0)*100).toFixed(0);
+    container.innerHTML = `<div class="card-grid">
+      <div class="card stat-card"><div class="stat-value text-accent">${stats.total}</div><div class="stat-label">条目总数</div></div>
+      <div class="card stat-card"><div class="stat-value text-success">${effPct}%</div><div class="stat-label">平均有效性</div></div>
+      <div class="card stat-card"><div class="stat-value">${Object.keys(stats.by_category||{}).length}</div><div class="stat-label">类别数</div></div>
+      <div class="card stat-card"><div class="stat-value" style="font-size:20px;">${stats.total_usage_count||0}</div><div class="stat-label">总使用次数</div></div>
+    </div>`;
+  } catch(err) {
+    document.getElementById('ek-summary').innerHTML = `<div class="empty-state" style="color:var(--critical);">${err.message}</div>`;
+  }
+}
+
+async function searchEk() {
+  const query = document.getElementById('search-query').value;
+  const category = document.getElementById('search-category').value;
+  const severity = document.getElementById('search-severity').value;
+
+  const params = new URLSearchParams();
+  if (query) params.set('query', query);
+  if (category) params.set('category', category);
+  if (severity) params.set('severity', severity);
+
+  try {
+    const entries = await API.get('/api/enterprise-knowledge/search?' + params.toString());
+    document.getElementById('search-count').textContent = `${entries.length} 条结果`;
+    const tbody = document.getElementById('ek-body');
+    if (!entries.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">未找到匹配条目。</td></tr>';
+      if (catChart) catChart.destroy();
+      return;
+    }
+    tbody.innerHTML = entries.map(e => `<tr style="cursor:pointer;" onclick="showEkDetail('${e.id}')">
+      <td title="${e.id}">${truncate(e.id, 8)}</td>
+      <td>${categoryBadge(e.category)}</td>
+      <td>${severityBadge(e.severity)}</td>
+      <td class="ellipsis" style="max-width:250px;" title="${e.title}">${e.title}</td>
+      <td>
+        <span>${(e.effectiveness_score*100).toFixed(0)}%</span>
+        <div class="progress-bar" style="width:50px;"><div class="progress-bar-fill" style="width:${(e.effectiveness_score*100).toFixed(0)}%;background:${e.effectiveness_score>=0.7?'var(--low)':e.effectiveness_score>=0.4?'var(--medium)':'var(--critical)'};"></div></div>
+      </td>
+      <td>${e.usage_count||0}</td>
+      <td><button class="btn btn-sm" onclick="event.stopPropagation();deleteEkEntry('${e.id}')">🗑</button></td>
+    </tr>`).join('');
+
+    // Category distribution chart
+    const catCounts = {};
+    entries.forEach(e => { catCounts[e.category] = (catCounts[e.category]||0) + 1; });
+    if (catChart) catChart.destroy();
+    const ctx = document.getElementById('ek-category-chart');
+    if (ctx) {
+      const labels = Object.keys(catCounts).map(k => k.replace(/_/g, ' '));
+      const data = Object.values(catCounts);
+      const colors = ['#7986cb','#81c784','#ffb74d','#ce93d8','#4fc3f7'];
+      catChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: colors.slice(0,labels.length), borderWidth: 0 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#9e9e9e', padding: 16 } },
+          },
+        },
+      });
+    }
+  } catch(err) {
+    document.getElementById('ek-body').innerHTML = `<tr><td colspan="7" style="color:var(--critical);">${err.message}</td></tr>`;
+  }
+}
+
+async function showEkDetail(id) {
+  try {
+    const entry = await API.get('/api/enterprise-knowledge/get?id=' + id);
+    const detail = document.getElementById('ek-detail');
+    detail.style.display = 'block';
+    document.getElementById('ek-detail-title').innerHTML = `${entry.title} <span style="font-size:13px;font-weight:400;color:var(--text-muted);">(${entry.category.replace(/_/g,' ')})</span>`;
+    document.getElementById('ek-detail-content').innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+        <div><span class="text-muted">严重程度:</span> ${severityBadge(entry.severity)}</div>
+        <div><span class="text-muted">有效性:</span> ${(entry.effectiveness_score*100).toFixed(0)}%</div>
+        <div><span class="text-muted">置信度:</span> ${(entry.confidence*100).toFixed(0)}%</div>
+        <div><span class="text-muted">使用次数:</span> ${entry.usage_count||0}</div>
+      </div>
+      <div style="margin-bottom:8px;"><span class="text-muted">标签:</span> ${(entry.tags||[]).map(t => `<span class="badge badge-info">${t}</span>`).join(' ')}</div>
+      <div style="margin-bottom:12px;padding:12px;background:var(--bg-primary);border-radius:8px;"><strong>内容:</strong><br>${entry.content||'-'}</div>
+      ${entry.remediation ? `<div style="padding:12px;background:var(--bg-primary);border-radius:8px;"><strong>修复措施:</strong><br>${entry.remediation}</div>` : ''}
+      <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">
+        创建时间: ${entry.created_at ? formatDate(entry.created_at) : '-'} |
+        更新时间: ${entry.updated_at ? formatDate(entry.updated_at) : '-'} |
+        来源: ${entry.source_type||'-'}
+      </div>
+    `;
+    detail.scrollIntoView({behavior:'smooth', block:'start'});
+  } catch(err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function addEkEntry() {
+  const title = document.getElementById('add-title').value.trim();
+  const content = document.getElementById('add-content').value.trim();
+  if (!title || !content) { showToast('标题和内容不能为空', 'error'); return; }
+  try {
+    await API.post('/api/enterprise-knowledge', {
+      title, content,
+      category: document.getElementById('add-category').value,
+      severity: document.getElementById('add-severity').value,
+      tags: document.getElementById('add-tags').value.split(',').map(t=>t.trim()).filter(t=>t),
+      remediation: document.getElementById('add-remediation').value,
+    });
+    hideModal('ek-add-modal');
+    showToast('条目已添加', 'success');
+    searchEk(); loadEkSummary();
+    document.getElementById('add-title').value = '';
+    document.getElementById('add-content').value = '';
+    document.getElementById('add-tags').value = '';
+    document.getElementById('add-remediation').value = '';
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function deleteEkEntry(id) {
+  if (!confirm('确定删除此条目?')) return;
+  try {
+    await API.del('/api/enterprise-knowledge/' + id);
+    showToast('条目已删除', 'success');
+    searchEk(); loadEkSummary();
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function rebuildEk() {
+  if (!confirm('从所有数据源重建? 这可能会创建重复条目。')) return;
+  try {
+    const result = await API.post('/api/enterprise-knowledge/rebuild');
+    showToast(`重建完成: ${result.created} 条已创建, ${result.skipped} 条已跳过`, 'success');
+    searchEk(); loadEkSummary();
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function seedEk() {
+  if (!confirm('初始化默认安全策略?')) return;
+  try {
+    const result = await API.post('/api/enterprise-knowledge/seed');
+    showToast(`已初始化 ${result.seeded} 条新策略`, 'success');
+    searchEk(); loadEkSummary();
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function previewRagContext() {
+  const type = document.getElementById('rag-type').value;
+  const endpoint = document.getElementById('rag-endpoint').value;
+  const severity = document.getElementById('rag-severity').value;
+  const params = new URLSearchParams();
+  if (type) params.set('incident_types', type);
+  if (endpoint) params.set('endpoints', endpoint);
+  if (severity) params.set('severities', severity);
+
+  try {
+    const result = await API.get('/api/enterprise-knowledge/context?' + params.toString());
+    document.getElementById('rag-result').style.display = 'block';
+    document.getElementById('rag-count').textContent = result.entries || 0;
+    document.getElementById('rag-context').textContent = result.context;
+  } catch(err) {
+    document.getElementById('rag-result').style.display = 'block';
+    document.getElementById('rag-context').textContent = '错误: ' + err.message;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => { loadEkSummary(); searchEk(); });
+</script>
+{% endblock %}

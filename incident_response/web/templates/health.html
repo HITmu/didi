@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}健康状态 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>健康状态追踪</h1>
+  <div class="page-actions">
+    <select class="form-select" id="endpoint-select" onchange="loadHealth()"><option value="">-- 选择端点 --</option></select>
+    <button class="btn btn-secondary" onclick="recalculateHealth()">重新计算分数</button>
+  </div>
+</div>
+<div id="health-container"><div class="loading"></div></div>
+<div class="card" id="chart-card" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h3>健康分数趋势</h3>
+    <span id="trend-badge"></span>
+  </div>
+  <div class="chart-container"><canvas id="health-chart"></canvas></div>
+</div>
+<div class="card" id="changes-card" style="display:none;">
+  <h3>健康变化记录</h3>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>安全事件</th><th>变化前</th><th>变化后</th><th>变化量</th><th>处置方式</th><th>改善</th>
+  </tr></thead><tbody id="changes-body"></tbody></table></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let healthChart = null;
+
+async function loadEndpoints() {
+  try {
+    const eps = await API.get('/api/health/endpoints');
+    const sel = document.getElementById('endpoint-select');
+    sel.innerHTML = '<option value="">-- 选择端点 --</option>' +
+      eps.map(e => `<option value="${e}">${e}</option>`).join('');
+    if (eps.length > 0) { sel.value = eps[0]; loadHealth(); }
+    else { document.getElementById('health-container').innerHTML = '<div class="empty-state"><div class="empty-icon">📈</div>暂无健康数据。当安全事件被处理时会创建健康记录。</div>'; }
+  } catch(err) {
+    document.getElementById('health-container').innerHTML = `<div class="empty-state" style="color:var(--critical);">${err.message}</div>`;
+  }
+}
+
+async function loadHealth() {
+  const ep = document.getElementById('endpoint-select').value;
+  if (!ep) return;
+  const container = document.getElementById('health-container');
+  container.innerHTML = '<div class="loading"></div>';
+  try {
+    const data = await API.get(`/api/health/trend?endpoint=${encodeURIComponent(ep)}&window=50`);
+    document.getElementById('chart-card').style.display = 'block';
+    document.getElementById('changes-card').style.display = 'block';
+
+    // 状态摘要
+    const cs = data.current_score || 0;
+    const statusClass = cs >= 0.8 ? 'badge-normal' : cs >= 0.5 ? 'badge-degraded' : 'badge-critical';
+    const statusLabel = cs >= 0.8 ? '正常' : cs >= 0.5 ? '降级' : '严重';
+    const arrow = data.trend === 'improving' ? '↑' : data.trend === 'declining' ? '↓' : '→';
+    const arrowColor = data.trend === 'improving' ? 'var(--low)' : data.trend === 'declining' ? 'var(--critical)' : 'var(--text-muted)';
+    document.getElementById('trend-badge').innerHTML = `
+      <span class="badge ${statusClass}">${statusLabel} (${cs.toFixed(3)})</span>
+      <span style="margin-left:8px;color:${arrowColor};font-size:18px;font-weight:700;">${arrow} ${data.trend}</span>
+    `;
+    container.innerHTML = `<div class="card-grid">
+      <div class="card stat-card"><div class="stat-value">${data.records_count||0}</div><div class="stat-label">记录数</div></div>
+      <div class="card stat-card"><div class="stat-value">${(data.avg_score||0).toFixed(3)}</div><div class="stat-label">平均分数</div></div>
+      <div class="card stat-card"><div class="stat-value">${(data.min_score||0).toFixed(3)}</div><div class="stat-label">最低分数</div></div>
+      <div class="card stat-card"><div class="stat-value">${(data.max_score||0).toFixed(3)}</div><div class="stat-label">最高分数</div></div>
+    </div>`;
+
+    // 图表
+    if (healthChart) healthChart.destroy();
+    const records = data.records || [];
+    if (records.length > 0) {
+      const labels = records.map(r => formatDate(r.timestamp));
+      const scores = records.map(r => r.health_score);
+      healthChart = new Chart(document.getElementById('health-chart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: '健康分数',
+            data: scores,
+            borderColor: '#4fc3f7',
+            backgroundColor: 'rgba(79,195,247,0.1)',
+            fill: true, tension: 0.3,
+            pointRadius: 3, pointHoverRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { y: { min: 0, max: 1, ticks: { stepSize: 0.2 } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // 变化记录
+    const changes = await API.get('/api/health/changes');
+    const filtered = changes.filter(c => c.api_endpoint === ep);
+    const tbody = document.getElementById('changes-body');
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">暂无变化记录</td></tr>'; return; }
+    tbody.innerHTML = filtered.slice(-20).reverse().map(c => {
+      const delta = c.health_delta || 0;
+      const cls = delta > 0 ? 'text-success' : delta < 0 ? 'text-critical' : 'text-muted';
+      return `<tr>
+        <td title="${c.incident_id||''}">${truncate(c.incident_id, 8)}</td>
+        <td>${(c.before?.health_score||0).toFixed(3)}</td>
+        <td>${(c.after?.health_score||0).toFixed(3)}</td>
+        <td class="${cls}">${delta > 0 ? '+' : ''}${delta.toFixed(4)}</td>
+        <td>${dispositionBadge(c.disposition_taken)}</td>
+        <td>${c.improvement ? '<span class="text-success">✓ 是</span>' : '<span class="text-critical">✗ 否</span>'}</td>
+      </tr>`;
+    }).join('');
+  } catch(err) {
+    container.innerHTML = `<div class="empty-state" style="color:var(--critical);">${err.message}</div>`;
+  }
+}
+
+async function recalculateHealth() {
+  if (!confirm('使用当前多因子权重重新计算所有健康分数? 这将修改历史记录。')) return;
+  try {
+    const result = await API.post('/api/health/recalculate');
+    showToast(`已重新计算: ${result.updated} 条记录已更新`, 'success');
+    loadHealth();
+  } catch(err) {
+    showToast('重新计算失败: ' + err.message, 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadEndpoints);
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ac5b9af2",
+    "name": "Zhang Wei",
+    "email": "zhangwei@example.com",
+    "phone": "",
+    "role": "security-lead",
+    "slack_webhook": "",
+    "created_at": "2026-05-27T06:42:30.913395"
+  },
+  {
+    "id": "1c2addf9",
+    "name": "Li Na",
+    "email": "lina@example.com",
+    "phone": "",
+    "role": "security-engineer",
+    "slack_webhook": "",
+    "created_at": "2026-05-27T06:42:30.913506"
+  },
+  {
+    "id": "bbfe9f52",
+    "name": "Wang Fang",
+    "email": "wangfang@example.com",
+    "phone": "",
+    "role": "devops-engineer",
+    "slack_webhook": "",
+    "created_at": "2026-05-27T06:42:30.913605"
+  }
+]

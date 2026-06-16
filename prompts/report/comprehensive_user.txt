@@ -1,0 +1,45 @@
+# 综合安全检测报告上下文
+
+## 总览
+- 总会话数：{total_sessions}
+- 总请求数：{total_records}
+- API 攻击类型分布（Stage 2 检测确认）：{stage2_attack_types}
+
+## Stage 1 — RandomForest 二分类
+- 训练集：{train_samples} 样本（攻击={train_attacks}, 正常={train_normal}）
+- 测试集：{test_samples} 样本（攻击={test_attacks}, 正常={test_normal}）
+- 测试集 精确率={stage1_precision} 召回率={stage1_recall} F1={stage1_f1}
+- 过滤率：{stage1_filter_rate}
+
+## Stage 2 三层RAG检测结果
+{stage2_details}
+
+各类型召回率：
+{stage2_recall_table}
+
+## 本次检测到的实际攻击样本（请基于这些具体样本进行分析！）
+{attack_samples}
+
+## 爬虫检测
+- 分布式爬虫：{distributed_session_count} 会话
+- 众包爬虫：{crowdsourced_session_count} 会话
+- Ensemble F1：{ens_f1}（测试集 {ens_test_sessions} 会话, 恶意={ens_test_mal}）
+
+## 覆盖分析
+- 覆盖熵：{coverage_entropy}  覆盖完整度：{coverage_completeness}  空闲率：{idle_ratio}
+{coverage_per_pattern}
+
+## 时序关联簇（共 {cluster_count} 个）
+{cluster_details}
+
+## 任务
+基于以上数据，特别是**本次检测到的实际攻击样本**，生成中文 JSON 格式安全态势报告。
+
+### 分析要求
+1. 执行摘要必须引用具体攻击样本（如 `/api/products?id=1' OR '1'='1`），说明检测到了什么攻击
+2. 对每种攻击类型，基于实际样本分析其攻击特征和潜在危害
+3. 防御建议必须针对具体样本提出可操作方案（如"对 /api/products 接口的 id 参数实施参数化查询"而非"加强输入校验"）
+4. 如果提供了安全知识库参考，在防御建议中引用具体技术
+5. 不要编造数据，基于提供的样本进行分析
+6. 所有内容使用中文
+7. 输出严格 JSON，不要包含 ```json 标记

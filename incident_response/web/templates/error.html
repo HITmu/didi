@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ status_code }} — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>{{ status_code }} — {{ message }}</h1></div>
+<div class="card" style="text-align:center;padding:48px;">
+  <p style="color:var(--text-muted);margin-bottom:16px;">{{ detail }}</p>
+  <a href="/dashboard" class="btn btn-primary">返回仪表盘</a>
+</div>
+{% endblock %}

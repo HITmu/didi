@@ -1,0 +1,124 @@
+You are detecting unauthorized access in web logs.
+
+TARGET: UNAUTHORIZED ACCESS ATTACK
+Only analyze for this. If not present: 'normal'
+
+CRITICAL RULES:
+User types: 'user' (regular) or 'admin' (administrator)
+Detection: Check user type + path + query parameters combination
+
+🚨 UNAUTHORIZED ACCESS ATTACK (Flag these):
+Regular user ('user') accessing ADMIN SYSTEM paths:
+
+/sysManager/* (system management)
+/server/* (server operations)
+/adminInfo, /adminDashboard (admin dashboards)
+Regular user accessing OTHER USERS' admin data:
+/admins/* (accessing other administrators' data)
+Exception: /admins/self or own admin data is NORMAL
+Regular user performing BATCH QUERY on RESTRICTED PATHS WITHOUT user identification:
+Accessing RESTRICTED PATHS (/addresses, /afterSaleServices) with ONLY these parameters (no userId/customerId):
+?page= (e.g., ?page=1, ?page=2&limit=10)
+?limit= (to increase returned data size, e.g., ?limit=100)
+?all= (e.g., ?all=true, ?all=1)
+?scope= (e.g., ?scope=company, ?scope=all)
+?admin_view= (e.g., ?admin_view=1)
+
+Note:
+Queries WITH userId= or customerId= parameters are NORMAL
+Other paths like /shippingAddresses, /billingAddresses follow normal rules (no special restrictions)
+
+✅ NORMAL (Do not flag):
+Administrator ('admin') accessing ANY path → ALWAYS NORMAL
+/sysManager/, /server/, /admins/* → ALL OK for admins
+Admin can access admin interfaces and system management
+Regular user accessing SELF-SERVICE admin paths:
+/admin/profile (own profile)
+/admin/settings (own settings)
+/admins/self (own admin data if applicable)
+Regular user data management:
+/users/, /orders/ (within their scope)
+Regular user accessing sensitive paths WITHOUT batch/privileged parameters:
+/addresses (no query parameters, assumed to return only current user's addresses)
+/afterSaleServices (no query parameters, assumed to return only current user's services)
+/addresses?user_id=self (explicit self-access)
+/addresses?mine=1
+/addresses?current_user=true
+
+Regular user accessing RESTRICTED PATHS WITH user identification parameters:
+
+/addresses?userId=123 → NORMAL (authorized user query)
+/afterSaleServices?customerId=456 → NORMAL
+/addresses?user_id=789 → NORMAL
+/afterSaleServices?userId=self → NORMAL
+/addresses?userId=123&page=1&limit=10 → NORMAL (authorized with pagination)
+/afterSaleServices?customerId=456&page=3&limit=5 → NORMAL (authorized with pagination)
+
+Regular user accessing PUBLIC data with batch parameters:
+/products?page=1&limit=10 (public product catalog)
+/categories?limit=50
+
+Pagination queries on other non-sensitive data interfaces.
+
+Regular user accessing NON-RESTRICTED address-related paths:
+/shippingAddresses?page=1&limit=10 → NORMAL (different path, no special restriction)
+/billingAddresses?limit=50 → NORMAL
+/contactAddresses?all=true → NORMAL
+
+⚠️ IMPORTANT DISTINCTION:
+Directory traversal attacks (../, ../../, etc.) → NOT unauthorized access
+If path contains traversal patterns → NOT this detector's concern
+Path traversal belongs to 'directory traversal attack' category
+Only flag as unauthorized if: wrong user type accessing protected path OR regular user using batch/privileged parameters on RESTRICTED PATHS WITHOUT user identification
+
+QUICK DECISION FLOW:
+User type = 'admin' → IMMEDIATELY NORMAL (admins can access anything)
+Path contains traversal patterns (../, ..) → NORMAL for this detector (different attack type)
+Regular user + Admin system paths (/sysManager/, /server/, /adminInfo, /adminDashboard) → ANOMALY
+Regular user + Other admins' data (/admins/otherAdmin) → ANOMALY
+Regular user + Path is RESTRICTED PATH (/addresses, /afterSaleServices) → Check parameters:
+a) Has userId/customerId/user_id parameter? → NORMAL (regardless of other parameters)
+b) Has ONLY batch/privileged parameters WITHOUT user identification? (page=, limit=, all=, scope=, admin_view=) → ANOMALY
+c) No parameters or safe parameters? (no params, user_id=self, mine=1) → NORMAL
+
+All other cases → NORMAL
+
+## CRITICAL: OUTPUT ONLY ONE LINE, NO EXPLANATIONS
+
+DO NOT output any text before or after the result.
+DO NOT output markdown, code blocks, or multiple lines.
+DO NOT explain your reasoning.
+
+## UNAUTHORIZED ACCESS OUTPUT EXAMPLES:
+
+**Normal examples (confidence 0.0):**
+{log_id}|normal|0.0|admin accessing /admins/admin - ADMIN ACCESSING ADMIN INTERFACE
+{log_id}|normal|0.0|user accessing /admin/profile - SELF-SERVICE
+{log_id}|normal|0.0|user accessing /addresses?AUTHORIZED WITH PAGINATION
+{log_id}|normal|0.0|user accessing /afterSaleServices - ACCESSING OWN SERVICES (NO BATCH PARAMS)
+
+**Anomaly examples (confidence 0.85-1.0):**
+{log_id}|anomaly|unauthorized access attack|0.95|user accessing /sysManager/reboot - regular user attempting system management endpoint
+{log_id}|anomaly|unauthorized access attack|0.95|user accessing /adminDashboard - regular user accessing admin dashboard
+{log_id}|anomaly|unauthorized access attack|0.92|user accessing /admins/admin456 - regular user accessing other admin's data
+{log_id}|anomaly|unauthorized access attack|0.90|user accessing /server/shutdown - regular user attempting server operation
+{log_id}|anomaly|unauthorized access attack|0.85|user accessing /addresses?all=true - admin parameter without user ID
+{log_id}|anomaly|unauthorized access attack|0.85|user accessing /addresses?scope=all - scope parameter attempting to access all records
+{log_id}|anomaly|unauthorized access attack|0.85|user accessing /afterSaleServices?admin_view=1 - admin view parameter without authorization
+
+**Anomaly examples (confidence 0.75-0.89 - likely violations):**
+{log_id}|anomaly|unauthorized access attack|0.88|user accessing /addresses?page=1&limit=10 - batch query without user ID
+{log_id}|anomaly|unauthorized access attack|0.88|user accessing /afterSaleServices?page=3&limit=5 - batch query without user ID
+{log_id}|anomaly|unauthorized access attack|0.85|user accessing /addresses?all=true - admin parameter without user ID
+
+**Borderline examples (confidence 0.50-0.74):**
+{log_id}|anomaly|unauthorized access attack|0.65|user accessing /admin/settings - may be misconfigured endpoint, further investigation needed
+{log_id}|anomaly|unauthorized access attack|0.60|guest user accessing /internal-api/status - low severity internal endpoint access
+
+## OUTPUT FORMAT (MANDATORY):
+- Normal:   {log_id}|normal|confidence|reason
+- Anomaly:  {log_id}|anomaly|unauthorized access attack|confidence|reason
+
+LOG:
+{{log_entry}}
+

@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}溯源分析 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>溯源分析</h1>
+  <div class="filter-bar">
+    <select class="form-select" id="api-filter">
+      <option value="">所有API</option>
+    </select>
+    <select class="form-select" id="trace-section">
+      <option value="timeline">时间线</option>
+      <option value="patterns">攻击模式</option>
+      <option value="path">路径追踪</option>
+      <option value="correlation">关联分析</option>
+    </select>
+    <button class="btn btn-primary" onclick="refreshTrace()">刷新</button>
+  </div>
+</div>
+
+<!-- 摘要卡片 -->
+<div class="card-grid" id="summary-cards">
+  <div class="card stat-card"><div class="stat-value text-accent" id="total-incidents">-</div><div class="stat-label">安全事件总数</div></div>
+  <div class="card stat-card"><div class="stat-value text-critical" id="critical-count">-</div><div class="stat-label">严重事件</div></div>
+  <div class="card stat-card"><div class="stat-value text-high" id="multi-hit">-</div><div class="stat-label">多次命中端点</div></div>
+  <div class="card stat-card"><div class="stat-value" id="escalations">-</div><div class="stat-label">严重程度升级</div></div>
+</div>
+
+<!-- 时间线区域 -->
+<div id="section-timeline" class="trace-section">
+  <div class="card">
+    <h3>事件时间线</h3>
+    <div class="chart-container chart-container-sm">
+      <canvas id="timeline-chart"></canvas>
+    </div>
+    <div class="table-wrap" style="max-height:400px;overflow-y:auto;">
+      <table class="table" id="timeline-table">
+        <thead><tr><th>时间</th><th>类型</th><th>API</th><th>详情</th></tr></thead>
+        <tbody id="timeline-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 攻击模式区域 -->
+<div id="section-patterns" class="trace-section" style="display:none;">
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <h3>攻击类型分布</h3>
+      <div class="chart-container chart-container-sm"><canvas id="patterns-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>受攻击最多端点</h3>
+      <div class="table-wrap"><table class="table" id="endpoints-table"><thead><tr><th>端点</th><th>命中次数</th></tr></thead><tbody id="endpoints-body"></tbody></table></div>
+    </div>
+  </div>
+  <div class="card mt-16">
+    <h3>严重程度升级</h3>
+    <div class="table-wrap"><table class="table" id="escalations-table"><thead><tr><th>端点</th><th>起始</th><th>结束</th><th>步骤数</th></tr></thead><tbody id="escalations-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- 路径追踪区域 -->
+<div id="section-path" class="trace-section" style="display:none;">
+  <div class="card">
+    <h3>攻击路径追踪</h3>
+    <div class="form-row" style="margin-bottom:16px;">
+      <div class="form-group"><input class="form-input" id="incident-id-input" placeholder="安全事件ID (例如: inc-xxxxx)"></div>
+      <div class="form-group"><button class="btn btn-primary" onclick="tracePath()">追踪</button></div>
+    </div>
+    <div id="path-container"><p class="text-muted">输入安全事件ID并点击追踪。</p></div>
+  </div>
+</div>
+
+<!-- 关联分析区域 -->
+<div id="section-correlation" class="trace-section" style="display:none;">
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <h3>大规模攻击窗口</h3>
+      <p class="text-muted" id="mass-windows">加载中...</p>
+      <div class="table-wrap mt-16"><table class="table"><thead><tr><th>时间窗口</th><th>API列表</th></tr></thead><tbody id="mass-body"></tbody></table></div>
+    </div>
+    <div class="card">
+      <h3>广泛攻击类型</h3>
+      <p class="text-muted" id="widespread-info">加载中...</p>
+      <div class="table-wrap mt-16"><table class="table"><thead><tr><th>类型</th><th>API列表</th></tr></thead><tbody id="widespread-body"></tbody></table></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let timelineChartInstance = null;
+let patternsChartInstance = null;
+
+async function loadApiEndpoints() {
+  try {
+    const eps = await API.get('/api/health/endpoints');
+    const sel = document.getElementById('api-filter');
+    eps.forEach(ep => { const o = document.createElement('option'); o.value = ep; o.textContent = ep; sel.appendChild(o); });
+  } catch(e) {}
+}
+
+async function refreshTrace() {
+  const api = document.getElementById('api-filter').value;
+  const section = document.getElementById('trace-section').value;
+
+  document.querySelectorAll('.trace-section').forEach(s => s.style.display = 'none');
+  document.getElementById('section-' + section).style.display = '';
+
+  if (section === 'timeline') loadTimeline(api);
+  else if (section === 'patterns') loadPatterns();
+  else if (section === 'correlation') loadCorrelation();
+}
+
+async function loadTimeline(api) {
+  try {
+    const data = await API.get('/api/traceability/timeline?api=' + encodeURIComponent(api || ''));
+    document.getElementById('total-incidents').textContent = data.total_incidents || 0;
+    document.getElementById('critical-count').textContent = (data.total_incidents || 0);
+    document.getElementById('multi-hit').textContent = '-';
+    document.getElementById('escalations').textContent = '-';
+
+    const events = data.timeline || [];
+    const tbody = document.getElementById('timeline-body');
+    tbody.innerHTML = '';
+    events.slice(-50).forEach(e => {
+      const cls = e.type === 'incident' ? 'badge-critical' : e.type === 'health_change' ? 'badge-high' : 'badge-info';
+      const detail = e.anomaly_type || e.health_score !== undefined ? 'score=' + e.health_score : e.health_delta !== undefined ? 'delta=' + e.health_delta.toFixed(3) : '';
+      tbody.innerHTML += `<tr><td>${(e.time || '').slice(0,19)}</td><td><span class="badge ${cls}">${e.type}</span></td><td>${e.api || '-'}</td><td class="ellipsis">${detail}</td></tr>`;
+    });
+
+    // 时间线图表 — 健康评分
+    const healthEvents = events.filter(e => e.type === 'health_snapshot' && e.health_score !== undefined);
+    if (timelineChartInstance) timelineChartInstance.destroy();
+    if (healthEvents.length > 1) {
+      const ctx = document.getElementById('timeline-chart').getContext('2d');
+      const labels = healthEvents.map(e => (e.time || '').slice(11,19));
+      timelineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: '健康分数',
+            data: healthEvents.map(e => e.health_score),
+            borderColor: '#4fc3f7',
+            backgroundColor: 'rgba(79,195,247,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#9e9e9e' } } },
+          scales: {
+            x: { ticks: { color: '#616161', maxTicksLimit: 12 } },
+            y: { min: 0, max: 1, ticks: { color: '#616161' } }
+          }
+        }
+      });
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function loadPatterns() {
+  try {
+    const data = await API.get('/api/traceability/patterns');
+    document.getElementById('total-incidents').textContent = data.total_incidents || 0;
+    document.getElementById('critical-count').textContent = data.total_incidents || 0;
+    document.getElementById('multi-hit').textContent = data.multi_hit_endpoints || 0;
+    document.getElementById('escalations').textContent = Object.keys(data.severity_escalations || {}).length;
+
+    // 按类型图表
+    const byType = data.by_type || {};
+    const labels = Object.keys(byType);
+    const values = Object.values(byType);
+    if (patternsChartInstance) patternsChartInstance.destroy();
+    if (labels.length) {
+      const colors = ['#ef5350','#ff9800','#ffc107','#4caf50','#42a5f5','#ab47bc','#26c6da'];
+      const ctx = document.getElementById('patterns-chart').getContext('2d');
+      patternsChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels, datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'right', labels: { color: '#9e9e9e', boxWidth: 12 } } }
+        }
+      });
+    }
+
+    // 端点表格
+    const eptbody = document.getElementById('endpoints-body');
+    eptbody.innerHTML = '';
+    (data.most_attacked_endpoints || []).forEach(([ep, cnt]) => {
+      eptbody.innerHTML += `<tr><td>${ep}</td><td><span class="badge badge-high">${cnt}</span></td></tr>`;
+    });
+
+    // 升级记录表格
+    const esctbody = document.getElementById('escalations-body');
+    esctbody.innerHTML = '';
+    Object.entries(data.severity_escalations || {}).forEach(([ep, info]) => {
+      esctbody.innerHTML += `<tr><td>${ep}</td><td><span class="badge badge-${info.start.toLowerCase()}">${info.start}</span></td><td><span class="badge badge-${info.end.toLowerCase()}">${info.end}</span></td><td>${info.step_count}</td></tr>`;
+    });
+  } catch(e) { console.error(e); }
+}
+
+async function tracePath() {
+  const id = document.getElementById('incident-id-input').value.trim();
+  if (!id) return;
+  try {
+    const data = await API.get('/api/traceability/trace?id=' + encodeURIComponent(id));
+    if (data.status === 'not_found') {
+      document.getElementById('path-container').innerHTML = `<p class="text-muted">安全事件 '${id}' 未找到。</p>`;
+      return;
+    }
+    const inc = data.incident || {};
+    let html = `
+      <div class="stat-row"><span class="stat-key">安全事件</span><span class="stat-val">${inc.id}</span></div>
+      <div class="stat-row"><span class="stat-key">API</span><span class="stat-val">${inc.api_endpoint}</span></div>
+      <div class="stat-row"><span class="stat-key">严重程度</span><span class="stat-val"><span class="badge badge-${(inc.severity || '').toLowerCase()}">${inc.severity}</span></span></div>
+      <div class="stat-row"><span class="stat-key">类型</span><span class="stat-val">${inc.anomaly_type}</span></div>
+      <div class="stat-row"><span class="stat-key">置信度</span><span class="stat-val">${((inc.confidence || 0) * 100).toFixed(0)}%</span></div>
+      <div class="stat-row"><span class="stat-key">处置方式</span><span class="stat-val">${inc.disposition}</span></div>
+      <div class="stat-row"><span class="stat-key">检测时间</span><span class="stat-val">${(inc.detected_at || '').slice(0,19)}</span></div>
+      <div class="stat-row"><span class="stat-key">原因</span><span class="stat-val">${inc.reason || '-'}</span></div>
+    `;
+    if (data.health_impact && data.health_impact.length) {
+      html += `<h4 style="margin:16px 0 8px;color:var(--text-secondary);">健康影响</h4>`;
+      data.health_impact.forEach(h => {
+        html += `<div class="stat-row"><span class="stat-key">${h.api_endpoint}</span><span class="stat-val ${(h.health_delta || 0) >= 0 ? 'text-success' : 'text-critical'}">${(h.health_delta || 0).toFixed(4)}</span></div>`;
+      });
+    }
+    if (data.knowledge_generated && data.knowledge_generated.length) {
+      html += `<h4 style="margin:16px 0 8px;color:var(--text-secondary);">生成的知识</h4>`;
+      data.knowledge_generated.forEach(k => {
+        html += `<div class="stat-row"><span class="stat-key">${k.id}</span><span class="stat-val">eff: ${(k.effectiveness || 0).toFixed(2)}</span></div>`;
+      });
+    }
+    if (data.nearby_incidents && data.nearby_incidents.length) {
+      html += `<h4 style="margin:16px 0 8px;color:var(--text-secondary);">邻近安全事件</h4>`;
+      data.nearby_incidents.forEach(n => {
+        html += `<div class="stat-row"><span class="stat-key">${n.id}</span><span class="stat-val"><span class="badge badge-${(n.severity || '').toLowerCase()}">${n.severity}</span> ${(n.detected_at || '').slice(0,19)}</span></div>`;
+      });
+    }
+    if (data.attack_path_summary) {
+      html += `<h4 style="margin:16px 0 8px;color:var(--text-secondary);">摘要</h4><p style="font-size:13px;">${data.attack_path_summary}</p>`;
+    }
+    document.getElementById('path-container').innerHTML = html;
+  } catch(e) {
+    document.getElementById('path-container').innerHTML = `<p class="text-muted">错误: ${e.message}</p>`;
+  }
+}
+
+async function loadCorrelation() {
+  try {
+    const data = await API.get('/api/traceability/correlate');
+    document.getElementById('total-incidents').textContent = data.total_incidents || 0;
+    document.getElementById('critical-count').textContent = data.total_incidents || 0;
+    document.getElementById('multi-hit').textContent = Object.keys(data.mass_attack_windows || {}).length;
+    document.getElementById('escalations').textContent = Object.keys(data.widespread_attack_types || {}).length;
+
+    document.getElementById('mass-windows').textContent = `${data.mass_attack_windows ? Object.keys(data.mass_attack_windows).length : 0} 个窗口`;
+    const massBody = document.getElementById('mass-body');
+    massBody.innerHTML = '';
+    Object.entries(data.mass_attack_windows || {}).forEach(([window, apis]) => {
+      massBody.innerHTML += `<tr><td>${window}</td><td>${apis.join(', ')}</td></tr>`;
+    });
+
+    document.getElementById('widespread-info').textContent = `${Object.keys(data.widespread_attack_types || {}).length} 种类型`;
+    const wideBody = document.getElementById('widespread-body');
+    wideBody.innerHTML = '';
+    Object.entries(data.widespread_attack_types || {}).forEach(([type, apis]) => {
+      wideBody.innerHTML += `<tr><td>${type}</td><td>${apis.join(', ')}</td></tr>`;
+    });
+  } catch(e) { console.error(e); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadApiEndpoints();
+  refreshTrace();
+  document.getElementById('trace-section').addEventListener('change', refreshTrace);
+  document.getElementById('api-filter').addEventListener('change', refreshTrace);
+});
+</script>
+{% endblock %}

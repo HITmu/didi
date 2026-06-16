@@ -1,0 +1,487 @@
+{
+  "total_sessions": 3074,
+  "total_records": 6877,
+  "true_distribution": {
+    "sql_injection": 290,
+    "legit_crawler": 343,
+    "distributed_crawler": 765,
+    "command_injection": 290,
+    "normal": 432,
+    "malicious_crawler": 2406,
+    "xss": 290,
+    "directory_traversal": 290,
+    "sensitive_data_leakage": 290,
+    "unauthorized_access": 290,
+    "csrf": 290,
+    "invalid_item_value": 290,
+    "performance_issue": 290,
+    "ssrf": 290,
+    "crowdsourced_crawler": 31
+  },
+  "detection_distribution": {
+    "normal": 3019,
+    "distributed_crawler": 36,
+    "crowdsourced_crawler": 18,
+    "suspicious": 1
+  },
+  "stage2_attack_types": {
+    "injection attack": 456,
+    "cross-site scripting attack": 290,
+    "directory traversal attack": 424,
+    "sensitive data leakage": 276,
+    "unauthorized access attack": 179,
+    "performance issue": 108,
+    "invalid item value": 169
+  },
+  "stage1_filter_rate": 0.1127,
+  "global_assessment": {
+    "has_distributed_crawler": true,
+    "has_crowdsourced_crawler": true,
+    "distributed_session_count": 36,
+    "crowdsourced_session_count": 18,
+    "suspicious_session_count": 1
+  },
+  "clusters": [
+    {
+      "size": 403,
+      "avg_fusion": 0.0639,
+      "determination": "normal"
+    },
+    {
+      "size": 102,
+      "avg_fusion": 0.1962,
+      "determination": "normal"
+    },
+    {
+      "size": 99,
+      "avg_fusion": 0.1954,
+      "determination": "normal"
+    },
+    {
+      "size": 102,
+      "avg_fusion": 0.1873,
+      "determination": "normal"
+    },
+    {
+      "size": 99,
+      "avg_fusion": 0.1962,
+      "determination": "normal"
+    },
+    {
+      "size": 103,
+      "avg_fusion": 0.1895,
+      "determination": "normal"
+    },
+    {
+      "size": 100,
+      "avg_fusion": 0.1854,
+      "determination": "normal"
+    },
+    {
+      "size": 101,
+      "avg_fusion": 0.1822,
+      "determination": "normal"
+    },
+    {
+      "size": 100,
+      "avg_fusion": 0.1854,
+      "determination": "normal"
+    },
+    {
+      "size": 102,
+      "avg_fusion": 0.1831,
+      "determination": "normal"
+    },
+    {
+      "size": 99,
+      "avg_fusion": 0.1832,
+      "determination": "normal"
+    },
+    {
+      "size": 507,
+      "avg_fusion": 0.0434,
+      "determination": "normal"
+    },
+    {
+      "size": 98,
+      "avg_fusion": 0.1856,
+      "determination": "normal"
+    },
+    {
+      "size": 82,
+      "avg_fusion": 0.1869,
+      "determination": "normal"
+    },
+    {
+      "size": 80,
+      "avg_fusion": 0.1942,
+      "determination": "normal"
+    },
+    {
+      "size": 82,
+      "avg_fusion": 0.1901,
+      "determination": "normal"
+    },
+    {
+      "size": 81,
+      "avg_fusion": 0.1953,
+      "determination": "normal"
+    },
+    {
+      "size": 76,
+      "avg_fusion": 0.1878,
+      "determination": "normal"
+    },
+    {
+      "size": 62,
+      "avg_fusion": 0.2055,
+      "determination": "normal"
+    },
+    {
+      "size": 58,
+      "avg_fusion": 0.2064,
+      "determination": "normal"
+    },
+    {
+      "size": 62,
+      "avg_fusion": 0.1903,
+      "determination": "normal"
+    },
+    {
+      "size": 308,
+      "avg_fusion": 0.0453,
+      "determination": "normal"
+    },
+    {
+      "size": 13,
+      "avg_fusion": 0.5692,
+      "determination": "distributed_crawler"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.4107,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.301,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3917,
+      "determination": "normal"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.5336,
+      "determination": "suspicious"
+    },
+    {
+      "size": 12,
+      "avg_fusion": 0.5889,
+      "determination": "distributed_crawler"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3859,
+      "determination": "normal"
+    }
+  ],
+  "coverage_global": {
+    "entropy": 0.9237,
+    "completeness": 0.0001,
+    "sequential_score": 0.5,
+    "idle_ratio": 0.9483,
+    "suspicious": false
+  },
+  "coverage_per_pattern": {
+    "unknown": {
+      "entropy": 0.9919,
+      "completeness": 0.0001,
+      "idle_ratio": 1.0,
+      "suspicious": false
+    },
+    "legit": {
+      "entropy": 0.999,
+      "completeness": 0.6429,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "scraper": {
+      "entropy": 0.9651,
+      "completeness": 0.625,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "normal": {
+      "entropy": 0.9985,
+      "completeness": 0.6429,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "credential_stuffer": {
+      "entropy": 1.0,
+      "completeness": 1.0,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "ddos_tool": {
+      "entropy": 1.0,
+      "completeness": 1.0,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "crowdsourced": {
+      "entropy": 1.0,
+      "completeness": 0.9394,
+      "idle_ratio": 0.8333,
+      "suspicious": true
+    }
+  },
+  "network": {
+    "crowdsourced_ratio": 0.1515,
+    "crowdsourced_flag": false
+  },
+  "malicious_details": [
+    {
+      "session_id": "malicious_distributed_scraper_2982a8",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_b17195",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_a9d1bc",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_57d794",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_be16e0",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_44da40",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_6eb79e",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_1369d6",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_e134a6",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5976
+    },
+    {
+      "session_id": "malicious_distributed_scraper_970934",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_ad6daf",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_4ced30",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_009732",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_1fe7ff",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_ea36c9",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_0e6a0c",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_54b3fb",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_47458f",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_d62adf",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_fc2e0a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5908
+    },
+    {
+      "session_id": "malicious_distributed_scraper_719a4b",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5714
+    },
+    {
+      "session_id": "malicious_distributed_scraper_039f29",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5714
+    },
+    {
+      "session_id": "malicious_distributed_scraper_cadefd",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5677
+    },
+    {
+      "session_id": "malicious_distributed_scraper_27d392",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    },
+    {
+      "session_id": "malicious_distributed_scraper_66d017",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    },
+    {
+      "session_id": "malicious_distributed_scraper_4e4fcd",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    },
+    {
+      "session_id": "malicious_distributed_scraper_ad609e",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    },
+    {
+      "session_id": "malicious_distributed_scraper_65bf98",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    },
+    {
+      "session_id": "malicious_distributed_scraper_ff47e1",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    },
+    {
+      "session_id": "malicious_distributed_scraper_65374b",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5635
+    }
+  ],
+  "stage1_metrics": {
+    "train_samples": 4813,
+    "train_attacks": 4271,
+    "train_normal": 542,
+    "test_samples": 2064,
+    "test_attacks": 1831,
+    "test_normal": 233,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 1831,
+    "fp": 0,
+    "tn": 233,
+    "fn": 0
+  },
+  "stage2_metrics": {
+    "per_type_recall": {
+      "injection attack": 0.5241379310344828,
+      "cross-site scripting attack": 1.0,
+      "directory traversal attack": 1.0,
+      "sensitive data leakage": 0.8275862068965517,
+      "unauthorized access attack": 0.3086206896551724,
+      "invalid item value": 0.5827586206896552,
+      "performance issue": 0.3724137931034483
+    },
+    "total_detected": 1902,
+    "tp_by_type": {
+      "injection attack": 456,
+      "cross-site scripting attack": 290,
+      "directory traversal attack": 290,
+      "sensitive data leakage": 240,
+      "unauthorized access attack": 179,
+      "performance issue": 108,
+      "invalid item value": 169
+    },
+    "fn_by_type": {
+      "injection attack": 870,
+      "cross-site scripting attack": 290,
+      "directory traversal attack": 290,
+      "sensitive data leakage": 290,
+      "unauthorized access attack": 580,
+      "invalid item value": 290,
+      "performance issue": 290
+    }
+  },
+  "stage4_metrics": {
+    "test_sessions": 50,
+    "test_mal": 27,
+    "test_normal": 23,
+    "precision": 0.8928571428571429,
+    "recall": 0.9259259259259259,
+    "f1": 0.9090909090909091,
+    "tp": 25,
+    "fp": 3,
+    "tn": 20,
+    "fn": 2
+  },
+  "_prompt_vars": {
+    "train_samples": 4813,
+    "train_attacks": 4271,
+    "train_normal": 542,
+    "test_samples": 2064,
+    "test_attacks": 1831,
+    "test_normal": 233,
+    "stage1_precision": "1.0000",
+    "stage1_recall": "1.0000",
+    "stage1_f1": "1.0000",
+    "stage1_filter_rate": "11.3%",
+    "stage2_attack_types": "{\"injection attack\": 456, \"cross-site scripting attack\": 290, \"directory traversal attack\": 424, \"sensitive data leakage\": 276, \"unauthorized access attack\": 179, \"performance issue\": 108, \"invalid item value\": 169}",
+    "stage2_details": "- injection attack: 456 条确认（regex召回率 52.4%)\n- directory traversal attack: 424 条确认（regex召回率 100.0%)\n- cross-site scripting attack: 290 条确认（regex召回率 100.0%)\n- sensitive data leakage: 276 条确认（regex召回率 82.8%)\n- unauthorized access attack: 179 条确认（regex召回率 30.9%)\n- invalid item value: 169 条确认（regex召回率 58.3%)\n- performance issue: 108 条确认（regex召回率 37.2%)",
+    "stage2_recall_table": "  directory traversal attack       100.0%\n  cross-site scripting attack      100.0%\n  unauthorized access attack        30.9%\n  injection attack                  52.4%\n  performance issue                 37.2%\n  sensitive data leakage            82.8%\n  invalid item value                58.3%",
+    "has_distributed_crawler": true,
+    "has_crowdsourced_crawler": true,
+    "distributed_session_count": 36,
+    "crowdsourced_session_count": 18,
+    "ens_test_sessions": 50,
+    "ens_test_mal": 27,
+    "ens_test_normal": 23,
+    "ens_precision": "0.8929",
+    "ens_recall": "0.9259",
+    "ens_f1": "0.9091",
+    "coverage_entropy": 0.9237,
+    "coverage_completeness": 0.0001,
+    "idle_ratio": 0.9483,
+    "coverage_per_pattern": "- credential_stuffer: entropy=1.0, completeness=1.0, idle_ratio=0.0\n- crowdsourced: entropy=1.0, completeness=0.9394, idle_ratio=0.8333\n- ddos_tool: entropy=1.0, completeness=1.0, idle_ratio=0.0\n- legit: entropy=0.999, completeness=0.6429, idle_ratio=0.0\n- normal: entropy=0.9985, completeness=0.6429, idle_ratio=0.0\n- scraper: entropy=0.9651, completeness=0.625, idle_ratio=0.0\n- unknown: entropy=0.9919, completeness=0.0001, idle_ratio=1.0",
+    "cluster_count": 29,
+    "cluster_details": "- 簇 #0: size=403, avg_fusion=0.0639, 判定=normal\n- 簇 #1: size=102, avg_fusion=0.1962, 判定=normal\n- 簇 #2: size=99, avg_fusion=0.1954, 判定=normal\n- 簇 #3: size=102, avg_fusion=0.1873, 判定=normal\n- 簇 #4: size=99, avg_fusion=0.1962, 判定=normal\n- 簇 #5: size=103, avg_fusion=0.1895, 判定=normal\n- 簇 #6: size=100, avg_fusion=0.1854, 判定=normal\n- 簇 #7: size=101, avg_fusion=0.1822, 判定=normal\n- 簇 #8: size=100, avg_fusion=0.1854, 判定=normal\n- 簇 #9: size=102, avg_fusion=0.1831, 判定=normal\n- 簇 #10: size=99, avg_fusion=0.1832, 判定=normal\n- 簇 #11: size=507, avg_fusion=0.0434, 判定=normal\n- 簇 #12: size=98, avg_fusion=0.1856, 判定=normal\n- 簇 #13: size=82, avg_fusion=0.1869, 判定=normal\n- 簇 #14: size=80, avg_fusion=0.1942, 判定=normal",
+    "malicious_details": "- malicious_distributed_scraper_2982a8: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_b17195: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_a9d1bc: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_57d794: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_be16e0: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_44da40: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_6eb79e: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_1369d6: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_e134a6: distributed_crawler (fusion=0.598)\n- malicious_distributed_scraper_970934: distributed_crawler (fusion=0.591)\n- malicious_distributed_scraper_ad6daf: distributed_crawler (fusion=0.591)\n- malicious_distributed_scraper_4ced30: distributed_crawler (fusion=0.591)\n- malicious_distributed_scraper_009732: distributed_crawler (fusion=0.591)\n- malicious_distributed_scraper_1fe7ff: distributed_crawler (fusion=0.591)\n- malicious_distributed_scraper_ea36c9: distributed_crawler (fusion=0.591)"
+  }
+}

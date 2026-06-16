@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}知识库 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>知识内化</h1></div>
+<div id="summary-container"><div class="loading"></div></div>
+
+<div class="card mb-16">
+  <h3>搜索与筛选</h3>
+  <div class="filter-bar" style="margin-top:8px;">
+    <input class="form-input" id="search-api" placeholder="API端点..." oninput="debounceSearch()">
+    <input class="form-input" id="search-type" placeholder="安全事件类型..." oninput="debounceSearch()">
+    <select class="form-select" id="search-effectiveness" onchange="searchKnowledge()">
+      <option value="0">最低有效性: 0.0</option>
+      <option value="0.3">最低有效性: 0.3</option>
+      <option value="0.5">最低有效性: 0.5</option>
+      <option value="0.7">最低有效性: 0.7</option>
+    </select>
+    <span id="search-count" class="text-muted" style="font-size:13px;"></span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+  <div class="card">
+    <h3>知识条目</h3>
+    <div class="table-wrap"><table class="table"><thead><tr>
+      <th>ID</th><th>API</th><th>类型</th><th>严重程度</th><th>处置方式</th><th>健康</th><th>有效性</th>
+    </tr></thead><tbody id="knowledge-body"></tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>有效性概览</h3>
+    <div class="chart-container chart-container-sm"><canvas id="effectiveness-chart"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>RAG 上下文构建器</h3>
+  <div class="filter-bar" style="margin-top:8px;">
+    <input class="form-input" id="rag-api" placeholder="API端点..." value="">
+    <input class="form-input" id="rag-type" placeholder="安全事件类型..." value="">
+    <button class="btn btn-primary" onclick="buildRagContext()">构建上下文</button>
+  </div>
+  <div id="rag-result" style="margin-top:12px;display:none;">
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">找到条目: <span id="rag-count">0</span></div>
+    <pre id="rag-context" style="background:var(--bg-primary);padding:16px;border-radius:8px;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;color:var(--text-primary);border:1px solid var(--border);"></pre>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let effChart = null;
+let searchTimer;
+
+function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(searchKnowledge, 300); }
+
+async function loadSummary() {
+  try {
+    const stats = await API.get('/api/knowledge/summary');
+    const container = document.getElementById('summary-container');
+    if (stats.total === 0) {
+      container.innerHTML = '<div class="card stat-card" style="text-align:center;"><div class="empty-icon">🧠</div>暂无知识条目。请通过处置引擎处理安全事件以生成知识。</div>';
+      return;
+    }
+    const effPct = ((stats.avg_effectiveness||0)*100).toFixed(0);
+    const effColor = (stats.avg_effectiveness||0) >= 0.7 ? 'var(--low)' : (stats.avg_effectiveness||0) >= 0.4 ? 'var(--medium)' : 'var(--critical)';
+    const impacts = stats.by_health_impact || {};
+    container.innerHTML = `<div class="card-grid">
+      <div class="card stat-card"><div class="stat-value text-accent">${stats.total}</div><div class="stat-label">条目总数</div></div>
+      <div class="card stat-card"><div class="stat-value" style="color:${effColor}">${effPct}%</div><div class="stat-label">平均有效性</div></div>
+      <div class="card stat-card"><div class="stat-value">${Object.keys(stats.by_incident_type||{}).length}</div><div class="stat-label">安全事件类型</div></div>
+      <div class="card stat-card"><div class="stat-value" style="font-size:20px;">
+        <span class="text-success">↑${impacts.improved||0}</span>
+        <span class="text-muted"> / </span>
+        <span class="text-critical">↓${impacts.degraded||0}</span>
+      </div><div class="stat-label">改善 / 恶化</div></div>
+    </div>`;
+  } catch(err) { document.getElementById('summary-container').innerHTML = `<div class="empty-state" style="color:var(--critical);">${err.message}</div>`; }
+}
+
+async function searchKnowledge() {
+  const api = document.getElementById('search-api').value;
+  const type = document.getElementById('search-type').value;
+  const minEff = document.getElementById('search-effectiveness').value;
+
+  const params = new URLSearchParams();
+  if (api) params.set('api', api);
+  if (type) params.set('incident_type', type);
+  if (minEff) params.set('min_effectiveness', minEff);
+
+  try {
+    const entries = await API.get('/api/knowledge/search?' + params.toString());
+    document.getElementById('search-count').textContent = `${entries.length} 条结果`;
+    const tbody = document.getElementById('knowledge-body');
+    if (!entries.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">未找到匹配条目。</td></tr>';
+      if (effChart) effChart.destroy();
+      return;
+    }
+    tbody.innerHTML = entries.map(k => `<tr>
+      <td title="${k.id}">${truncate(k.id, 8)}</td>
+      <td class="ellipsis" title="${k.api_endpoint}">${k.api_endpoint}</td>
+      <td>${k.incident_type}</td>
+      <td>${severityBadge(k.severity)}</td>
+      <td>${dispositionBadge(k.disposition_taken)}</td>
+      <td>${healthImpactBadge(k.health_impact)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span>${(k.effectiveness_score*100).toFixed(0)}%</span>
+          <div class="progress-bar" style="width:60px;flex:1;"><div class="progress-bar-fill" style="width:${(k.effectiveness_score*100).toFixed(0)}%;background:${k.effectiveness_score>=0.7?'var(--low)':k.effectiveness_score>=0.4?'var(--medium)':'var(--critical)'};"></div></div>
+        </div>
+      </td>
+    </tr>`).join('');
+
+    // 有效性柱状图
+    if (effChart) effChart.destroy();
+    const ctx = document.getElementById('effectiveness-chart');
+    if (ctx) {
+      const labels = entries.map(k => truncate(k.id, 6));
+      const data = entries.map(k => k.effectiveness_score);
+      const colors = data.map(v => v >= 0.7 ? '#4caf50' : v >= 0.4 ? '#ffc107' : '#ef5350');
+      effChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: '有效性', data, backgroundColor: colors, borderWidth: 0, borderRadius: 4 }] },
+        options: {
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          scales: { x: { min: 0, max: 1, ticks: { stepSize: 0.2 } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+  } catch(err) { document.getElementById('knowledge-body').innerHTML = `<tr><td colspan="7" style="color:var(--critical);">${err.message}</td></tr>`; }
+}
+
+async function buildRagContext() {
+  const api = document.getElementById('rag-api').value;
+  const type = document.getElementById('rag-type').value;
+  if (!api || !type) { showToast('请输入API端点和安全事件类型', 'error'); return; }
+
+  try {
+    const result = await API.get(`/api/knowledge/rag-context?api=${encodeURIComponent(api)}&incident_type=${encodeURIComponent(type)}`);
+    document.getElementById('rag-result').style.display = 'block';
+    document.getElementById('rag-count').textContent = result.entry_count;
+    document.getElementById('rag-context').textContent = result.context;
+  } catch(err) {
+    document.getElementById('rag-result').style.display = 'block';
+    document.getElementById('rag-context').textContent = '错误: ' + err.message;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => { loadSummary(); searchKnowledge(); });
+</script>
+{% endblock %}

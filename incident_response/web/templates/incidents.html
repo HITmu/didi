@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}安全事件 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>安全事件</h1></div>
+<div class="filter-bar">
+  <input class="form-input" id="filter-api" placeholder="按API端点筛选..." oninput="debounceFilter()">
+  <select class="form-select" id="filter-severity" onchange="applyFilters()">
+    <option value="">所有严重程度</option>
+    <option value="CRITICAL">CRITICAL</option>
+    <option value="HIGH">HIGH</option>
+    <option value="MEDIUM">MEDIUM</option>
+    <option value="LOW">LOW</option>
+    <option value="INFO">INFO</option>
+  </select>
+  <span id="result-count" class="text-muted" style="font-size:13px;"></span>
+</div>
+<div class="card">
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>ID</th><th>API端点</th><th>严重程度</th><th>置信度</th><th>类型</th><th>处置方式</th><th>状态</th><th>检测时间</th>
+  </tr></thead><tbody id="incidents-body"></tbody></table></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let filterTimer;
+
+function debounceFilter() { clearTimeout(filterTimer); filterTimer = setTimeout(applyFilters, 300); }
+
+async function applyFilters() {
+  const api = document.getElementById('filter-api').value;
+  const sev = document.getElementById('filter-severity').value;
+  const params = new URLSearchParams({limit: 200});
+  if (api) params.set('api', api);
+  if (sev) params.set('severity', sev);
+
+  try {
+    const incidents = await API.get('/api/incidents?' + params.toString());
+    document.getElementById('result-count').textContent = `显示 ${incidents.length} 条安全事件`;
+    const tbody = document.getElementById('incidents-body');
+    if (!incidents.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">未找到安全事件。</td></tr>';
+      return;
+    }
+    tbody.innerHTML = incidents.map(i => `<tr>
+      <td title="${i.id}">${truncate(i.id, 8)}</td>
+      <td class="ellipsis" title="${i.api_endpoint}">${i.api_endpoint}</td>
+      <td>${severityBadge(i.severity)}</td>
+      <td>${formatPct(i.confidence)}</td>
+      <td>${i.anomaly_type || '-'}</td>
+      <td>${dispositionBadge(i.disposition)}</td>
+      <td>${statusBadge(i.disposition_status)}</td>
+      <td>${formatDate(i.detected_at)}</td>
+    </tr>`).join('');
+  } catch(err) {
+    document.getElementById('incidents-body').innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--critical);">加载失败: ${err.message}</td></tr>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', applyFilters);
+</script>
+{% endblock %}

@@ -1,0 +1,578 @@
+[
+  {
+    "id": "90431ebbe472",
+    "title": "SQL Injection Prevention",
+    "content": "SQL injection occurs when untrusted data is sent to an interpreter as part of a command or query. Attackers can execute arbitrary SQL via unsanitized input in parameters, request bodies, or headers. Common patterns include: ' OR 1=1--, UNION SELECT, and time-based blind injection techniques. All database queries must use parameterized statements or prepared statements. ORM frameworks (SQLAlchemy, Django ORM) provide automatic parameterization when used correctly.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "sql_injection",
+      "injection",
+      "owasp_top_10",
+      "database"
+    ],
+    "severity": "CRITICAL",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Use parameterized queries / prepared statements for all database operations. 2. Apply strict input validation with allowlist patterns per field type. 3. Use a WAF (Web Application Firewall) to filter known SQL injection patterns. 4. Implement least-privilege database accounts per service. 5. Conduct regular dynamic application security testing (DAST).",
+    "effectiveness_score": 0.9,
+    "confidence": 0.95,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055886",
+    "updated_at": "2026-05-26T02:12:52.055886",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "7cd0011e5c68",
+    "title": "Directory Traversal Prevention",
+    "content": "Directory traversal (path traversal) attacks use ../ sequences or encoded variants to access files outside the web root directory. Attackers target endpoints that accept file paths, download parameters, or resource identifiers. Encoded variants include URL-encoded (%2e%2e%2f), double-encoded, and Unicode-based bypass attempts.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "directory_traversal",
+      "path_traversal",
+      "file_access"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Maintain an allowlist of permitted file paths and reject all others. 2. Normalize all file paths using os.path.realpath() and validate against a base directory. 3. Reject input containing ../, ..\\, or any encoded variants. 4. Use a chroot jail or container filesystem isolation. 5. Serve files through a dedicated endpoint that validates the resolved path.",
+    "effectiveness_score": 0.85,
+    "confidence": 0.9,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055897",
+    "updated_at": "2026-05-26T02:12:52.055897",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "8f569ecd1567",
+    "title": "Cross-Site Scripting (XSS) Prevention",
+    "content": "XSS attacks inject client-side scripts into web pages viewed by other users. Three types: reflected XSS (payload in request reflected in response), stored XSS (payload persisted on server), and DOM-based XSS (client-side script injection via URL fragment). Attack vectors include <script> tags, event handlers (onerror=), javascript: URLs, and SVG injection.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "xss",
+      "cross_site_scripting",
+      "injection",
+      "owasp_top_10"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Apply context-aware output encoding for HTML, attributes, JavaScript, CSS, and URLs. 2. Set Content-Security-Policy (CSP) headers with strict directives. 3. Use a Content-Security-Policy nonce for inline scripts. 4. Implement input sanitization with an allowlist approach. 5. Set X-Content-Type-Options: nosniff and HttpOnly flags on cookies.",
+    "effectiveness_score": 0.85,
+    "confidence": 0.9,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055901",
+    "updated_at": "2026-05-26T02:12:52.055901",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "e537957af91a",
+    "title": "Unauthorized Access Prevention",
+    "content": "Unauthorized access occurs when users access resources without proper authentication or authorization. Common scenarios: accessing admin endpoints without admin privileges, IDOR (Insecure Direct Object References) where a user accesses another user's resources by modifying IDs, and privilege escalation through parameter manipulation.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "unauthorized_access",
+      "authentication",
+      "authorization",
+      "rbac"
+    ],
+    "severity": "CRITICAL",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Implement Role-Based Access Control (RBAC) with least-privilege principle. 2. Validate JWT tokens on every request including signature, expiry, and claims. 3. Implement proper session management with short-lived tokens and rotation. 4. Use attribute-based access control (ABAC) for fine-grained resource-level permissions. 5. Enable MFA for all administrative interfaces.",
+    "effectiveness_score": 0.9,
+    "confidence": 0.95,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055904",
+    "updated_at": "2026-05-26T02:12:52.055904",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "81d111ca82c2",
+    "title": "Sensitive Data Leakage Prevention",
+    "content": "Sensitive data leakage occurs when API responses expose personally identifiable information (PII), credentials, internal IP addresses, stack traces, or configuration details. Common sources: verbose error messages, debug endpoints left enabled, excessive response fields, and logging sensitive data.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "sensitive_data_leakage",
+      "data_exposure",
+      "pii",
+      "privacy"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Implement response field filtering: never return fields like password_hash, ssn, or credit_card. 2. Apply data masking for partial display of sensitive fields (e.g., ****-****-****-1234). 3. Use field-level access control to restrict sensitive data per role. 4. Disable debug/stacktrace output in production. 5. Implement a response schema validation layer.",
+    "effectiveness_score": 0.8,
+    "confidence": 0.85,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055907",
+    "updated_at": "2026-05-26T02:12:52.055907",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "a74cfb9446ba",
+    "title": "Command Injection Prevention",
+    "content": "Command injection attacks execute arbitrary OS commands via unsanitized input passed to system calls. Common sinks: os.system(), subprocess.Popen(shell=True), exec(), eval(). Attackers inject commands using shell metacharacters: ;, |, &&, ||, $(), backticks.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "command_injection",
+      "injection",
+      "shell",
+      "os_command"
+    ],
+    "severity": "CRITICAL",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Avoid shell=True in subprocess calls; use list arguments instead of command strings. 2. Use safe APIs that do not invoke a shell (e.g., shlex.quote for needed shell calls). 3. Implement strict input validation with allowlist patterns. 4. Run services with minimal OS permissions (non-root, read-only filesystem where feasible). 5. Containerize applications to limit blast radius of successful injection.",
+    "effectiveness_score": 0.85,
+    "confidence": 0.9,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055910",
+    "updated_at": "2026-05-26T02:12:52.055910",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "b62c9f9c569c",
+    "title": "Server-Side Request Forgery (SSRF) Prevention",
+    "content": "SSRF attacks trick the server into making requests to internal or restricted resources. Attackers provide URLs pointing to internal services (127.0.0.1, 10.x.x.x, metadata endpoints) that the server then fetches. This can lead to internal network scanning, cloud metadata exfiltration, and remote code execution.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "ssrf",
+      "server_side_request_forgery",
+      "internal_network"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Maintain an allowlist of permitted external URLs/schemes the server may access. 2. Disable unused URL schemes (file://, dict://, gopher://). 3. Implement network segmentation so application servers cannot reach internal metadata endpoints. 4. Validate and sanitize all user-supplied URLs before making requests. 5. Use a dedicated HTTP client with restricted redirect following.",
+    "effectiveness_score": 0.8,
+    "confidence": 0.85,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055913",
+    "updated_at": "2026-05-26T02:12:52.055913",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "5a49b75d7683",
+    "title": "CSRF Prevention",
+    "content": "Cross-Site Request Forgery (CSRF) tricks authenticated users into executing unwanted actions on a web application they're authenticated to. Attackers craft malicious pages that trigger state-changing requests (POST, PUT, DELETE) using the victim's active session.",
+    "category": "policy",
+    "source_type": "security_policy",
+    "source_ids": [],
+    "tags": [
+      "csrf",
+      "cross_site_request_forgery",
+      "session",
+      "authentication"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "1. Use anti-CSRF tokens for all state-changing requests (synchronizer token pattern). 2. Set SameSite=Strict or SameSite=Lax on session cookies. 3. Validate Origin and Referer headers for sensitive operations. 4. Implement double-submit cookie pattern for stateless CSRF protection. 5. Require re-authentication for sensitive actions (password changes, financial operations).",
+    "effectiveness_score": 0.8,
+    "confidence": 0.85,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:52.055916",
+    "updated_at": "2026-05-26T02:12:52.055916",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "c1e83cb7d315",
+    "title": "Case: sql_injection on /api/login",
+    "content": "Pattern: Incident type 'sql_injection' on /api/login at severity HIGH — health remained stable. Disposition applied: notify_email. Confidence: 95%.\nRecommendation: Monitor 'notify_email' for HIGH sql_injection incidents on /api/login — no significant health change.",
+    "category": "case",
+    "source_type": "internalized_knowledge",
+    "source_ids": [
+      "07dd0541"
+    ],
+    "tags": [
+      "sql_injection",
+      "login"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "/api/login"
+    ],
+    "remediation": "Monitor 'notify_email' for HIGH sql_injection incidents on /api/login — no significant health change.",
+    "effectiveness_score": 0.7,
+    "confidence": 0.595,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141318",
+    "updated_at": "2026-05-26T02:12:56.141318",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "3bb4df0c4daa",
+    "title": "Case: directory_traversal on /api/download/..%2f..%2f..%2fetc%2fpasswd",
+    "content": "Pattern: Incident type 'directory_traversal' on /api/download/..%2f..%2f..%2fetc%2fpasswd at severity HIGH — health remained stable. Disposition applied: notify_email. Confidence: 95%.\nRecommendation: Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/..%2f..%2f..%2fetc%2fpasswd — no significant health change.",
+    "category": "case",
+    "source_type": "internalized_knowledge",
+    "source_ids": [
+      "a23f211e"
+    ],
+    "tags": [
+      "directory_traversal",
+      "..%2f..%2f..%2fetc%2fpasswd"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "/api/download/..%2f..%2f..%2fetc%2fpasswd"
+    ],
+    "remediation": "Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/..%2f..%2f..%2fetc%2fpasswd — no significant health change.",
+    "effectiveness_score": 0.7,
+    "confidence": 0.595,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141325",
+    "updated_at": "2026-05-26T02:12:56.141325",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "d35e4d7be225",
+    "title": "Case: directory_traversal on /api/download/../../../etc/passwd",
+    "content": "Pattern: Incident type 'directory_traversal' on /api/download/../../../etc/passwd at severity HIGH — health remained stable. Disposition applied: notify_email. Confidence: 95%.\nRecommendation: Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/../../../etc/passwd — no significant health change.",
+    "category": "case",
+    "source_type": "internalized_knowledge",
+    "source_ids": [
+      "27c9f4f9"
+    ],
+    "tags": [
+      "directory_traversal",
+      "passwd"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "/api/download/../../../etc/passwd"
+    ],
+    "remediation": "Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/../../../etc/passwd — no significant health change.",
+    "effectiveness_score": 0.7,
+    "confidence": 0.595,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141329",
+    "updated_at": "2026-05-26T02:12:56.141329",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "0b8c1b444b7f",
+    "title": "Case: directory_traversal on /api/download/....//....//....//etc/hosts",
+    "content": "Pattern: Incident type 'directory_traversal' on /api/download/....//....//....//etc/hosts at severity HIGH — health remained stable. Disposition applied: notify_email. Confidence: 95%.\nRecommendation: Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/....//....//....//etc/hosts — no significant health change.",
+    "category": "case",
+    "source_type": "internalized_knowledge",
+    "source_ids": [
+      "a6e25a9d"
+    ],
+    "tags": [
+      "directory_traversal",
+      "hosts"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "/api/download/....//....//....//etc/hosts"
+    ],
+    "remediation": "Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/....//....//....//etc/hosts — no significant health change.",
+    "effectiveness_score": 0.7,
+    "confidence": 0.595,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141339",
+    "updated_at": "2026-05-26T02:12:56.141339",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "ac3d2a2a39b5",
+    "title": "Case: directory_traversal on /api/download/../admin/backups/db_dump.sql",
+    "content": "Pattern: Incident type 'directory_traversal' on /api/download/../admin/backups/db_dump.sql at severity HIGH — health remained stable. Disposition applied: notify_email. Confidence: 95%.\nRecommendation: Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/../admin/backups/db_dump.sql — no significant health change.",
+    "category": "case",
+    "source_type": "internalized_knowledge",
+    "source_ids": [
+      "6a4b15cd"
+    ],
+    "tags": [
+      "directory_traversal",
+      "db_dump.sql"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "/api/download/../admin/backups/db_dump.sql"
+    ],
+    "remediation": "Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/../admin/backups/db_dump.sql — no significant health change.",
+    "effectiveness_score": 0.7,
+    "confidence": 0.595,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141344",
+    "updated_at": "2026-05-26T02:12:56.141344",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "02ca3faeecc3",
+    "title": "Pattern: sql_injection",
+    "content": "Attack type 'sql_injection' appears 1 times across tracked incidents.",
+    "category": "pattern",
+    "source_type": "traceability",
+    "source_ids": [],
+    "tags": [
+      "sql_injection",
+      "traceability"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.6,
+    "confidence": 0.7,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141418",
+    "updated_at": "2026-05-26T02:12:56.141418",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "e052e3ae48b6",
+    "title": "Pattern: directory_traversal",
+    "content": "Attack type 'directory_traversal' appears 14 times across tracked incidents.",
+    "category": "pattern",
+    "source_type": "traceability",
+    "source_ids": [],
+    "tags": [
+      "directory_traversal",
+      "traceability"
+    ],
+    "severity": "HIGH",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.6,
+    "confidence": 0.7,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141423",
+    "updated_at": "2026-05-26T02:12:56.141423",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "d1ff752cf9da",
+    "title": "Best Practice: directory_traversal",
+    "content": "Best practice guidance for handling 'directory_traversal' incidents based on disposition experience.",
+    "category": "best_practice",
+    "source_type": "nlg_explainer",
+    "source_ids": [],
+    "tags": [
+      "directory_traversal",
+      "best_practice"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141429",
+    "updated_at": "2026-05-26T02:12:56.141429",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "f8037aa4f6d8",
+    "title": "Best Practice: injection",
+    "content": "Best practice guidance for handling 'injection' incidents based on disposition experience.",
+    "category": "best_practice",
+    "source_type": "nlg_explainer",
+    "source_ids": [],
+    "tags": [
+      "injection",
+      "best_practice"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141432",
+    "updated_at": "2026-05-26T02:12:56.141432",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "463d40f61a3e",
+    "title": "Best Practice: xss",
+    "content": "Best practice guidance for handling 'xss' incidents based on disposition experience.",
+    "category": "best_practice",
+    "source_type": "nlg_explainer",
+    "source_ids": [],
+    "tags": [
+      "xss",
+      "best_practice"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141435",
+    "updated_at": "2026-05-26T02:12:56.141435",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "cea1023aaee2",
+    "title": "Best Practice: unauthorized_access",
+    "content": "Best practice guidance for handling 'unauthorized_access' incidents based on disposition experience.",
+    "category": "best_practice",
+    "source_type": "nlg_explainer",
+    "source_ids": [],
+    "tags": [
+      "unauthorized_access",
+      "best_practice"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141439",
+    "updated_at": "2026-05-26T02:12:56.141439",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "407c50464c25",
+    "title": "Best Practice: sensitive_data_leakage",
+    "content": "Best practice guidance for handling 'sensitive_data_leakage' incidents based on disposition experience.",
+    "category": "best_practice",
+    "source_type": "nlg_explainer",
+    "source_ids": [],
+    "tags": [
+      "sensitive_data_leakage",
+      "best_practice"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141442",
+    "updated_at": "2026-05-26T02:12:56.141442",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "97f30cfda701",
+    "title": "Best Practice: performance",
+    "content": "Best practice guidance for handling 'performance' incidents based on disposition experience.",
+    "category": "best_practice",
+    "source_type": "nlg_explainer",
+    "source_ids": [],
+    "tags": [
+      "performance",
+      "best_practice"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:12:56.141445",
+    "updated_at": "2026-05-26T02:12:56.141445",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "10e9b8d07970",
+    "title": "Recommendation: directory_traversal",
+    "content": "Monitor 'notify_email' for HIGH directory_traversal incidents on /api/download/..%2f..%2f..%2fetc%2fpasswd — no significant health change.",
+    "category": "best_practice",
+    "source_type": "report_insight",
+    "source_ids": [],
+    "tags": [
+      "directory_traversal",
+      "recommendation"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:13:05.926749",
+    "updated_at": "2026-05-26T02:13:05.926749",
+    "last_used_at": "",
+    "is_active": true
+  },
+  {
+    "id": "e65e94e99902",
+    "title": "Recommendation: sql_injection",
+    "content": "Monitor 'notify_email' for HIGH sql_injection incidents on /api/login — no significant health change.",
+    "category": "best_practice",
+    "source_type": "report_insight",
+    "source_ids": [],
+    "tags": [
+      "sql_injection",
+      "recommendation"
+    ],
+    "severity": "MEDIUM",
+    "affected_endpoints": [
+      "*"
+    ],
+    "remediation": "",
+    "effectiveness_score": 0.5,
+    "confidence": 0.5,
+    "usage_count": 0,
+    "created_at": "2026-05-26T02:13:05.926753",
+    "updated_at": "2026-05-26T02:13:05.926753",
+    "last_used_at": "",
+    "is_active": true
+  }
+]

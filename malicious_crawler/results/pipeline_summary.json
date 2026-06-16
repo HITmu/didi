@@ -1,0 +1,390 @@
+{
+  "total_sessions": 142,
+  "total_records": 2463,
+  "true_distribution": {
+    "distributed_crawler": 1197,
+    "normal": 704,
+    "legit_crawler": 532,
+    "crowdsourced_crawler": 30
+  },
+  "detection_distribution": {
+    "distributed_crawler": 33,
+    "normal": 95,
+    "crowdsourced_crawler": 14
+  },
+  "global_assessment": {
+    "has_distributed_crawler": true,
+    "has_crowdsourced_crawler": true,
+    "distributed_session_count": 33,
+    "crowdsourced_session_count": 14,
+    "suspicious_session_count": 0
+  },
+  "clusters": [
+    {
+      "size": 3,
+      "avg_fusion": 0.3716,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.259,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.408,
+      "determination": "normal"
+    },
+    {
+      "size": 12,
+      "avg_fusion": 0.6376,
+      "determination": "distributed_crawler"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3319,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3512,
+      "determination": "normal"
+    },
+    {
+      "size": 3,
+      "avg_fusion": 0.3506,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.2287,
+      "determination": "normal"
+    },
+    {
+      "size": 24,
+      "avg_fusion": 0.5815,
+      "determination": "distributed_crawler"
+    }
+  ],
+  "coverage_global": {
+    "entropy": 0.7814,
+    "completeness": 0.8333,
+    "sequential_score": 0.1803,
+    "idle_ratio": 0.0563,
+    "suspicious": false
+  },
+  "coverage_per_pattern": {
+    "scraper": {
+      "entropy": 0.9781,
+      "completeness": 0.5714,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "ddos_tool": {
+      "entropy": 0.9976,
+      "completeness": 0.6667,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "normal": {
+      "entropy": 0.9998,
+      "completeness": 0.8462,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "credential_stuffer": {
+      "entropy": 0.9807,
+      "completeness": 0.6667,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "legit": {
+      "entropy": 1.0,
+      "completeness": 0.8333,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "crowdsourced": {
+      "entropy": 1.0,
+      "completeness": 0.7692,
+      "idle_ratio": 0.5714,
+      "suspicious": true
+    }
+  },
+  "network": {
+    "crowdsourced_ratio": 0.1702,
+    "crowdsourced_flag": false
+  },
+  "malicious_details": [
+    {
+      "session_id": "malicious_scraper_0ab78070",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6704,
+      "temporal_score": 0.9111,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_fbf8bc6c",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6704,
+      "temporal_score": 0.9111,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_55f0d423",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6704,
+      "temporal_score": 0.9111,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_25da07e3",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6704,
+      "temporal_score": 0.9111,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_b4dc6742",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6704,
+      "temporal_score": 0.9111,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_1168674a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6646,
+      "temporal_score": 0.8946,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_d662db19",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6646,
+      "temporal_score": 0.8946,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_cfd1f2cb",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6622,
+      "temporal_score": 0.8875,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_192a0a80",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6617,
+      "temporal_score": 0.8861,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_8fad1574",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6573,
+      "temporal_score": 0.8736,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_5124816a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6573,
+      "temporal_score": 0.8736,
+      "coverage_score": 0.1472,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_5f26b2ef",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6289,
+      "temporal_score": 0.8582,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_ce773761",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6288,
+      "temporal_score": 0.858,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_9c2ccbe5",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6288,
+      "temporal_score": 0.858,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_60e37cb3",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6288,
+      "temporal_score": 0.858,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_b0a96536",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6288,
+      "temporal_score": 0.858,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_7a402890",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6257,
+      "temporal_score": 0.8491,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_f4d8190c",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6257,
+      "temporal_score": 0.8491,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_4d9498c2",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6257,
+      "temporal_score": 0.8491,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_b191a09b",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6244,
+      "temporal_score": 0.8455,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_ac5d0e21",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6244,
+      "temporal_score": 0.8455,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_f432d5b4",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6212,
+      "temporal_score": 0.8363,
+      "coverage_score": 0.1672,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_b4f3fbb3",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5904,
+      "temporal_score": 0.8305,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_babb494d",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5893,
+      "temporal_score": 0.8276,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_13b9ebed",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.583,
+      "temporal_score": 0.8094,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_9076637e",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.583,
+      "temporal_score": 0.8094,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_05277578",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5816,
+      "temporal_score": 0.8055,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_53c1d89e",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5777,
+      "temporal_score": 0.7944,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_f81db0de",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5777,
+      "temporal_score": 0.7942,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_7395f8a8",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5772,
+      "temporal_score": 0.7928,
+      "coverage_score": 0.1705,
+      "network_score": 0.8,
+      "in_cluster": true
+    }
+  ]
+}

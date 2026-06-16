@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}人员与绑定 — 安全事件响应系统{% endblock %}
+{% block content %}
+<div class="page-header"><h1>人员与绑定</h1></div>
+
+<!-- 人员区域 -->
+<div class="card mb-16">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h3>责任人</h3>
+    <button class="btn btn-primary btn-sm" onclick="showModal('person-modal');clearPersonForm()">+ 添加人员</button>
+  </div>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>ID</th><th>姓名</th><th>邮箱</th><th>角色</th><th>电话</th><th>操作</th>
+  </tr></thead><tbody id="persons-body"></tbody></table></div>
+</div>
+
+<!-- 绑定区域 -->
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h3>API绑定</h3>
+    <button class="btn btn-primary btn-sm" id="add-binding-btn" onclick="showModal('binding-modal');clearBindingForm()">+ 添加绑定</button>
+  </div>
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th>ID</th><th>API模式</th><th>人员</th><th>优先级</th><th>描述</th><th>操作</th>
+  </tr></thead><tbody id="bindings-body"></tbody></table></div>
+</div>
+
+<!-- 人员弹窗 -->
+<div class="modal" id="person-modal">
+  <div class="modal-backdrop" onclick="hideModal('person-modal')"></div>
+  <div class="modal-body">
+    <h2 id="person-modal-title">添加人员</h2>
+    <form id="person-form" onsubmit="savePerson(event)">
+      <input type="hidden" id="person-id">
+      <div class="form-group"><label class="form-label">姓名 *</label><input class="form-input" id="person-name" required></div>
+      <div class="form-group"><label class="form-label">邮箱 *</label><input class="form-input" id="person-email" type="email" required></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">角色</label><select class="form-select" id="person-role"><option value="developer">开发人员</option><option value="security-engineer">安全工程师</option><option value="admin">管理员</option></select></div>
+        <div class="form-group"><label class="form-label">电话</label><input class="form-input" id="person-phone"></div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('person-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 绑定弹窗 -->
+<div class="modal" id="binding-modal">
+  <div class="modal-backdrop" onclick="hideModal('binding-modal')"></div>
+  <div class="modal-body">
+    <h2>添加绑定</h2>
+    <form id="binding-form" onsubmit="saveBinding(event)">
+      <div class="form-group"><label class="form-label">API模式 *</label><input class="form-input" id="binding-pattern" required placeholder="/api/users/*"></div>
+      <div class="form-group"><label class="form-label">人员 *</label><select class="form-select" id="binding-person" required></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">优先级</label><input class="form-input" id="binding-priority" type="number" value="0"></div>
+        <div class="form-group"><label class="form-label">描述</label><input class="form-input" id="binding-desc"></div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="hideModal('binding-modal')">取消</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadPersons() {
+  try {
+    const persons = await API.get('/api/persons');
+    const tbody = document.getElementById('persons-body');
+    if (!persons.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">暂无注册人员。</td></tr>'; return; }
+    tbody.innerHTML = persons.map(p => `<tr>
+      <td title="${p.id}">${truncate(p.id, 8)}</td>
+      <td>${p.name}</td>
+      <td>${p.email}</td>
+      <td>${p.role}</td>
+      <td>${p.phone || '-'}</td>
+      <td class="flex gap-8">
+        <button class="btn btn-secondary btn-sm" onclick="editPerson('${p.id}')">编辑</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePerson('${p.id}')">删除</button>
+      </td>
+    </tr>`).join('');
+  } catch(err) { document.getElementById('persons-body').innerHTML = `<tr><td colspan="6" style="color:var(--critical);">${err.message}</td></tr>`; }
+}
+
+async function loadBindings() {
+  try {
+    const bindings = await API.get('/api/bindings');
+    const tbody = document.getElementById('bindings-body');
+    if (!bindings.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">暂无绑定配置。</td></tr>'; return; }
+    tbody.innerHTML = bindings.map(b => `<tr>
+      <td title="${b.id}">${truncate(b.id, 8)}</td>
+      <td><code style="color:var(--accent);">${b.api_pattern}</code></td>
+      <td>${b.person_name || '未知'}</td>
+      <td>${b.priority}</td>
+      <td>${b.description || '-'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteBinding('${b.id}')">删除</button></td>
+    </tr>`).join('');
+  } catch(err) { document.getElementById('bindings-body').innerHTML = `<tr><td colspan="6" style="color:var(--critical);">${err.message}</td></tr>`; }
+}
+
+async function populatePersonDropdown() {
+  const persons = await API.get('/api/persons');
+  const sel = document.getElementById('binding-person');
+  sel.innerHTML = persons.map(p => `<option value="${p.id}">${p.name} (${p.email})</option>`).join('');
+  document.getElementById('add-binding-btn').disabled = persons.length === 0;
+  document.getElementById('add-binding-btn').title = persons.length === 0 ? '请先添加人员' : '';
+}
+
+function clearPersonForm() {
+  document.getElementById('person-id').value = '';
+  document.getElementById('person-name').value = '';
+  document.getElementById('person-email').value = '';
+  document.getElementById('person-role').value = 'developer';
+  document.getElementById('person-phone').value = '';
+  document.getElementById('person-modal-title').textContent = '添加人员';
+}
+
+async function savePerson(e) {
+  e.preventDefault();
+  const id = document.getElementById('person-id').value;
+  const data = {
+    name: document.getElementById('person-name').value,
+    email: document.getElementById('person-email').value,
+    role: document.getElementById('person-role').value,
+    phone: document.getElementById('person-phone').value,
+  };
+  try {
+    if (id) { await API.put('/api/persons/' + id, data); showToast('人员信息已更新', 'success'); }
+    else { await API.post('/api/persons', data); showToast('人员已添加', 'success'); }
+    hideModal('person-modal');
+    loadPersons(); populatePersonDropdown();
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function editPerson(id) {
+  try {
+    const persons = await API.get('/api/persons');
+    const p = persons.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('person-id').value = p.id;
+    document.getElementById('person-name').value = p.name;
+    document.getElementById('person-email').value = p.email;
+    document.getElementById('person-role').value = p.role || 'developer';
+    document.getElementById('person-phone').value = p.phone || '';
+    document.getElementById('person-modal-title').textContent = '编辑人员';
+    showModal('person-modal');
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function deletePerson(id) {
+  if (!confirm('确定删除此人员? 相关绑定也将被移除。')) return;
+  try { await API.del('/api/persons/' + id); showToast('人员已删除', 'success'); loadPersons(); loadBindings(); populatePersonDropdown(); }
+  catch(err) { showToast(err.message, 'error'); }
+}
+
+function clearBindingForm() {
+  document.getElementById('binding-pattern').value = '';
+  document.getElementById('binding-person').value = '';
+  document.getElementById('binding-priority').value = '0';
+  document.getElementById('binding-desc').value = '';
+}
+
+async function saveBinding(e) {
+  e.preventDefault();
+  const data = {
+    api_pattern: document.getElementById('binding-pattern').value,
+    person_id: document.getElementById('binding-person').value,
+    priority: parseInt(document.getElementById('binding-priority').value) || 0,
+    description: document.getElementById('binding-desc').value,
+  };
+  try {
+    await API.post('/api/bindings', data);
+    showToast('绑定已添加', 'success');
+    hideModal('binding-modal');
+    loadBindings();
+  } catch(err) { showToast(err.message, 'error'); }
+}
+
+async function deleteBinding(id) {
+  if (!confirm('确定移除此绑定?')) return;
+  try { await API.del('/api/bindings/' + id); showToast('绑定已移除', 'success'); loadBindings(); }
+  catch(err) { showToast(err.message, 'error'); }
+}
+
+document.addEventListener('DOMContentLoaded', () => { loadPersons(); loadBindings(); populatePersonDropdown(); });
+</script>
+{% endblock %}

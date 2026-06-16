@@ -1,0 +1,30 @@
+### 输出 JSON Schema
+{
+  "executive_summary": {
+    "overall_risk_level": "HIGH|MEDIUM|LOW",
+    "key_findings": ["基于爬虫数据的要点1", "要点2"]
+  },
+  "crawler_analysis": {
+    "overview": "爬虫检测总体情况",
+    "distributed_crawlers": [{
+      "cluster_size": "集群规模",
+      "detection_evidence": "检出依据（时序+覆盖+网络分析）",
+      "behavior_pattern": "行为模式",
+      "impact": "影响",
+      "remediation": "防御建议"
+    }],
+    "crowdsourced_crawlers": {
+      "detected": true,
+      "session_count": "会话数",
+      "analysis": "众包爬虫分析"
+    }
+  },
+  "defense_recommendations": [
+    {"priority": "HIGH|MEDIUM|LOW", "title": "建议标题", "description": "具体描述"}
+  ],
+  "conclusion": {
+    "overall_assessment": "总体评估",
+    "immediate_actions": ["行动1"],
+    "long_term_improvements": ["改进1"]
+  }
+}

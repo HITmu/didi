@@ -1,0 +1,707 @@
+{
+  "total_sessions": 1011,
+  "total_records": 6007,
+  "true_distribution": {
+    "normal": 2269,
+    "malicious_crawler": 2400,
+    "distributed_crawler": 1124,
+    "legit_crawler": 189,
+    "crowdsourced_crawler": 25
+  },
+  "detection_distribution": {
+    "normal": 967,
+    "distributed_crawler": 33,
+    "crowdsourced_crawler": 11
+  },
+  "global_assessment": {
+    "has_distributed_crawler": true,
+    "has_crowdsourced_crawler": true,
+    "distributed_session_count": 33,
+    "crowdsourced_session_count": 11,
+    "suspicious_session_count": 0
+  },
+  "clusters": [
+    {
+      "size": 11,
+      "avg_fusion": 0.7008,
+      "determination": "distributed_crawler"
+    },
+    {
+      "size": 22,
+      "avg_fusion": 0.6147,
+      "determination": "distributed_crawler"
+    },
+    {
+      "size": 50,
+      "avg_fusion": 0.363,
+      "determination": "normal"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.1468,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 23,
+      "avg_fusion": 0.1371,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 18,
+      "avg_fusion": 0.143,
+      "determination": "normal"
+    },
+    {
+      "size": 9,
+      "avg_fusion": 0.1623,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.1493,
+      "determination": "normal"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.1474,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 23,
+      "avg_fusion": 0.1356,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 18,
+      "avg_fusion": 0.143,
+      "determination": "normal"
+    },
+    {
+      "size": 9,
+      "avg_fusion": 0.1623,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.1487,
+      "determination": "normal"
+    },
+    {
+      "size": 14,
+      "avg_fusion": 0.148,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1667,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.1842,
+      "determination": "normal"
+    },
+    {
+      "size": 6,
+      "avg_fusion": 0.1784,
+      "determination": "normal"
+    },
+    {
+      "size": 23,
+      "avg_fusion": 0.1363,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 4,
+      "avg_fusion": 0.1841,
+      "determination": "normal"
+    },
+    {
+      "size": 5,
+      "avg_fusion": 0.2017,
+      "determination": "normal"
+    }
+  ],
+  "coverage_global": {
+    "entropy": 0.8075,
+    "completeness": 0.9453,
+    "sequential_score": 0.0,
+    "idle_ratio": 0.0049,
+    "suspicious": false
+  },
+  "coverage_per_pattern": {
+    "unknown": {
+      "entropy": 0.8039,
+      "completeness": 0.9478,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "credential_stuffer": {
+      "entropy": 0.9955,
+      "completeness": 0.6875,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "ddos_tool": {
+      "entropy": 0.9791,
+      "completeness": 0.7,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "legit": {
+      "entropy": 1.0,
+      "completeness": 0.8333,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "scraper": {
+      "entropy": 0.9939,
+      "completeness": 0.6667,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "normal": {
+      "entropy": 0.9941,
+      "completeness": 0.8462,
+      "idle_ratio": 0.0,
+      "suspicious": false
+    },
+    "crowdsourced": {
+      "entropy": 1.0,
+      "completeness": 0.7576,
+      "idle_ratio": 0.4545,
+      "suspicious": true
+    }
+  },
+  "network": {
+    "crowdsourced_ratio": 0.1136,
+    "crowdsourced_flag": false
+  },
+  "malicious_details": [
+    {
+      "session_id": "malicious_scraper_e8715a09",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7015,
+      "temporal_score": 0.9792,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_53e9ecba",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7015,
+      "temporal_score": 0.9792,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_2c7e2acb",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7015,
+      "temporal_score": 0.9792,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_5db41985",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7015,
+      "temporal_score": 0.9792,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_cb724759",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7015,
+      "temporal_score": 0.9792,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_3afa30ae",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7015,
+      "temporal_score": 0.9792,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_715396e8",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7,
+      "temporal_score": 0.975,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_1303e619",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7,
+      "temporal_score": 0.975,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_96bafc05",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7,
+      "temporal_score": 0.975,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_5f8ed855",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7,
+      "temporal_score": 0.975,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_scraper_520bdb2c",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.7,
+      "temporal_score": 0.975,
+      "coverage_score": 0.1679,
+      "network_score": 1.0,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_9773e939",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6391,
+      "temporal_score": 0.8753,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_b98749a7",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6391,
+      "temporal_score": 0.8753,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_7c744270",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6391,
+      "temporal_score": 0.8753,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_447a3068",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6373,
+      "temporal_score": 0.8702,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_0e86eca6",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6373,
+      "temporal_score": 0.8702,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_3f66ff9a",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6348,
+      "temporal_score": 0.8631,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_50995b82",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6348,
+      "temporal_score": 0.8631,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_9fb7b132",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6348,
+      "temporal_score": 0.8631,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_ebf35f9d",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6299,
+      "temporal_score": 0.8491,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_90147e1f",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6294,
+      "temporal_score": 0.8478,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_ddos_tool_c68790ef",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.6244,
+      "temporal_score": 0.8335,
+      "coverage_score": 0.1792,
+      "network_score": 0.9,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_090c8ed3",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5995,
+      "temporal_score": 0.8545,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_fb334178",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5995,
+      "temporal_score": 0.8545,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_2e844a93",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5995,
+      "temporal_score": 0.8545,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_61af5fcb",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5995,
+      "temporal_score": 0.8545,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_48030388",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.595,
+      "temporal_score": 0.8414,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_19f584db",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.595,
+      "temporal_score": 0.8414,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_e0ec8afb",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.595,
+      "temporal_score": 0.8414,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    },
+    {
+      "session_id": "malicious_credential_stuffer_009c5df2",
+      "determination": "distributed_crawler",
+      "fusion_score": 0.5932,
+      "temporal_score": 0.8364,
+      "coverage_score": 0.1728,
+      "network_score": 0.8,
+      "in_cluster": true
+    }
+  ]
+}

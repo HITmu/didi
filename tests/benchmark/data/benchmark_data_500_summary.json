@@ -1,0 +1,12 @@
+{
+  "total": 500,
+  "anomalies": 75,
+  "normal": 425,
+  "anomaly_ratio": 0.15,
+  "by_type": {
+    "directory_traversal": 17,
+    "injection": 19,
+    "xss": 19,
+    "unauthorized_access": 20
+  }
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>爬虫检测 — 安全事件响应系统</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+.crawler-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin:16px 0 }
+.stat-card { background:#1a1d23; border-radius:8px; padding:20px; border:1px solid #2d3139 }
+.stat-card h3 { margin:0 0 8px; font-size:14px; color:#8b8fa3 }
+.stat-card .value { font-size:28px; font-weight:700 }
+.stat-card .sub { font-size:12px; color:#8b8fa3; margin-top:4px }
+.cluster-table { width:100%; border-collapse:collapse; margin:16px 0 }
+.cluster-table th,.cluster-table td { padding:10px 12px; text-align:left; border-bottom:1px solid #2d3139 }
+.cluster-table th { color:#8b8fa3; font-size:12px; text-transform:uppercase }
+.badge-dc { background:#ff4444; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px }
+.badge-cc { background:#ff8800; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px }
+.badge-suspicious { background:#ffcc00; color:#000; padding:2px 8px; border-radius:4px; font-size:12px }
+.badge-normal { background:#2d3139; color:#8b8fa3; padding:2px 8px; border-radius:4px; font-size:12px }
+.pattern-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #2d3139 }
+.pattern-row:last-child { border-bottom:none }
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-header"><h2>安全事件响应系统</h2></div>
+  <ul class="nav-list">
+    <li class="nav-item"><a href="/dashboard"><span>仪表盘</span></a></li>
+    <li class="nav-item"><a href="/health"><span>健康状态</span></a></li>
+    <li class="nav-item"><a href="/incidents"><span>安全事件</span></a></li>
+    <li class="nav-item"><a href="/persons"><span>人员与绑定</span></a></li>
+    <li class="nav-item"><a href="/knowledge"><span>知识库</span></a></li>
+    <li class="nav-item"><a href="/enterprise-knowledge"><span>企业知识库</span></a></li>
+    <li class="nav-item"><a href="/report"><span>安全报告</span></a></li>
+    <li class="nav-item"><a href="/graph"><span>知识图谱</span></a></li>
+    <li class="nav-item"><a href="/traceability"><span>溯源分析</span></a></li>
+    <li class="nav-item active"><a href="/crawler"><span>爬虫检测</span></a></li>
+  </ul>
+  <div class="sidebar-footer">安全事件响应系统 v1.0.0</div>
+</nav>
+<main class="content">
+<h1>爬虫检测仪表盘</h1>
+<div id="summary-stats" class="crawler-grid"></div>
+
+<h2>覆盖率分析</h2>
+<div class="crawler-grid" id="coverage-cards"></div>
+
+<h2>各模式覆盖率</h2>
+<div id="pattern-coverage" style="margin:16px 0; background:#1a1d23; border-radius:8px; padding:16px; border:1px solid #2d3139"></div>
+
+<h2>时间聚类</h2>
+<table class="cluster-table" id="cluster-table">
+<thead><tr><th>聚类ID</th><th>大小</th><th>平均融合度</th><th>判定</th><th>成员</th></tr></thead>
+<tbody></tbody>
+</table>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px">
+  <div id="malicious-details" style="background:#1a1d23; border-radius:8px; padding:16px; border:1px solid #2d3139">
+    <h3>恶意会话详情</h3>
+    <div id="malicious-list"></div>
+  </div>
+  <div>
+    <div style="background:#1a1d23; border-radius:8px; padding:16px; border:1px solid #2d3139">
+      <h3>判定分布</h3>
+      <canvas id="determination-chart" height="200"></canvas>
+    </div>
+    <div style="background:#1a1d23; border-radius:8px; padding:16px; border:1px solid #2d3139; margin-top:12px">
+      <h3>全局评估</h3>
+      <div id="global-assessment"></div>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+async function loadData() {
+  const res = await fetch('/api/crawler/summary');
+  const data = await res.json();
+  if (!data || !data.global_assessment) { document.querySelector('.content').innerHTML += '<p style="color:#ff4444">暂无爬虫检测数据。</p>'; return; }
+  const ga = data.global_assessment;
+  document.getElementById('summary-stats').innerHTML = `
+    <div class="stat-card"><h3>总会话数</h3><div class="value">${data.total_sessions}</div></div>
+    <div class="stat-card"><h3>总记录数</h3><div class="value">${data.total_records}</div></div>
+    <div class="stat-card"><h3>分布式爬虫</h3><div class="value" style="color:#ff4444">${ga.distributed_session_count}</div><div class="sub">${ga.has_distributed_crawler ? '已确认' : '未检测到'}</div></div>
+    <div class="stat-card"><h3>众包爬虫</h3><div class="value" style="color:#ff8800">${ga.crowdsourced_session_count}</div><div class="sub">${ga.has_crowdsourced_crawler ? '已确认' : '未检测到'}</div></div>
+    <div class="stat-card"><h3>可疑</h3><div class="value">${ga.suspicious_session_count}</div></div>
+  `;
+  const cg = data.coverage_global || {};
+  document.getElementById('coverage-cards').innerHTML = `
+    <div class="stat-card"><h3>覆盖率熵</h3><div class="value">${cg.entropy ?? 'N/A'}</div><div class="sub">越低 = 越系统化</div></div>
+    <div class="stat-card"><h3>完整度</h3><div class="value">${cg.completeness ?? 'N/A'}</div><div class="sub">越高 = 覆盖率越完整</div></div>
+    <div class="stat-card"><h3>顺序评分</h3><div class="value">${cg.sequential_score ?? 'N/A'}</div><div class="sub">越高 = 访问越有序</div></div>
+    <div class="stat-card"><h3>空闲比率</h3><div class="value">${cg.idle_ratio ?? 'N/A'}</div><div class="sub">越高 = 众包嫌疑越大</div></div>
+  `;
+  const pat = data.coverage_per_pattern || {};
+  const patHtml = Object.entries(pat).map(([name, p]) =>
+    `<div class="pattern-row"><span><strong>${name}</strong></span><span>entropy=${p.entropy}</span><span>completeness=${p.completeness}</span><span>idle=${p.idle_ratio}</span><span>${p.suspicious ? '<span class="badge-suspicious">可疑</span>' : '<span class="badge-normal">正常</span>'}</span></div>`
+  ).join('');
+  document.getElementById('pattern-coverage').innerHTML = `<h3 style="margin-top:0">模式覆盖</h3>${patHtml}`;
+  const clusters = data.clusters || [];
+  document.querySelector('#cluster-table tbody').innerHTML = clusters.map((c, i) =>
+    `<tr><td>#${i}</td><td>${c.size}</td><td>${c.avg_fusion}</td><td><span class="badge-${c.determination === 'distributed_crawler' ? 'dc' : c.determination === 'crowdsourced_crawler' ? 'cc' : c.determination === 'suspicious' ? 'suspicious' : 'normal'}">${c.determination}</span></td><td>${c.members ? c.members.slice(0,3).join(', ') + (c.members.length > 3 ? '...' : '') : ''}</td></tr>`
+  ).join('');
+  const mal = data.malicious_details || [];
+  document.getElementById('malicious-list').innerHTML = mal.slice(0, 15).map(m =>
+    `<div style="padding:6px 0; border-bottom:1px solid #2d3139; font-size:13px">
+      <span class="badge-${m.determination === 'distributed_crawler' ? 'dc' : m.determination === 'crowdsourced_crawler' ? 'cc' : 'suspicious'}">${m.determination}</span>
+      <span style="float:right">fusion=${m.fusion_score}</span>
+      <div style="color:#8b8fa3; font-size:11px">${m.session_id.substring(0,30)}...</div>
+    </div>`
+  ).join('');
+  const det = data.detection_distribution || {};
+  const detLabels = Object.keys(det);
+  const detData = Object.values(det);
+  new Chart(document.getElementById('determination-chart'), {
+    type: 'doughnut',
+    data: { labels: detLabels, datasets: [{ data: detData, backgroundColor: ['#ff4444','#ff8800','#ffcc00','#2d3139','#4caf50'] }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#ccc' } } } }
+  });
+  document.getElementById('global-assessment').innerHTML = `
+    <div style="margin:8px 0"><span class="badge-dc">分布式: ${ga.distributed_session_count}</span></div>
+    <div style="margin:8px 0"><span class="badge-cc">众包: ${ga.crowdsourced_session_count}</span></div>
+    <div style="margin:8px 0"><span class="badge-suspicious">可疑: ${ga.suspicious_session_count}</span></div>
+  `;
+}
+loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}安全事件响应系统{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+{% block head_extra %}{% endblock %}
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-header"><h2>安全事件响应系统</h2></div>
+  <ul class="nav-list">
+    <li class="nav-item {{ 'active' if active_page == 'dashboard' }}"><a href="/dashboard"><span>仪表盘</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'health' }}"><a href="/health"><span>健康状态</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'incidents' }}"><a href="/incidents"><span>安全事件</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'persons' }}"><a href="/persons"><span>人员与绑定</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'knowledge' }}"><a href="/knowledge"><span>知识库</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'enterprise_knowledge' }}"><a href="/enterprise-knowledge"><span>企业知识库</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'report' }}"><a href="/report"><span>安全报告</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'graph' }}"><a href="/graph"><span>知识图谱</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'traceability' }}"><a href="/traceability"><span>溯源分析</span></a></li>
+    <li class="nav-item {{ 'active' if active_page == 'crawler' }}"><a href="/crawler"><span>爬虫检测</span></a></li>
+  </ul>
+  <div class="sidebar-footer">安全事件响应系统 v1.0.0</div>
+</nav>
+<main class="content">
+  {% block content %}{% endblock %}
+</main>
+<script src="/static/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
